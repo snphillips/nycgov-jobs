@@ -1,8 +1,7 @@
-import type { FC } from 'react';
 import clsx from 'clsx';
 import type { NYCJobType } from '../types'
 
-export interface JobCardProps {
+interface JobCardProps {
   job: NYCJobType;
   onFavorite: (job: NYCJobType) => void;
   onApplied: (job: NYCJobType) => void;
@@ -23,14 +22,13 @@ const formatSalary = (from: string, to: string, freq: string) => {
   return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`;
 };
 
-/* ───────────── Component ───────────── */
-const JobCard: FC<JobCardProps> = ({
+function JobCard({
   job,
   onFavorite,
   onApplied,
   isFavorited = false,
   isApplied = false,
-}) => {
+}: JobCardProps){
   const employmentType =
     job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time';
 

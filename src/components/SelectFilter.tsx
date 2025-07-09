@@ -1,4 +1,4 @@
-import type { FC, ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 
 /* ────────────────────────────────────────────────────────────────
    SelectFilter – a small, reusable dropdown filter.
@@ -18,12 +18,12 @@ import type { FC, ChangeEvent } from 'react';
        onChange={setEmploymentFilter}
      />
 */
-export interface Option {
+interface Option {
   value: string;
   label: string;
 }
 
-export interface SelectFilterProps {
+interface SelectFilterProps {
   /** htmlFor / id so the label is accessible */
   id: string;
   label: string;
@@ -35,14 +35,14 @@ export interface SelectFilterProps {
   includeAllOption?: boolean;
 }
 
-const SelectFilter: FC<SelectFilterProps> = ({
+function SelectFilter({
   id,
   label,
   options,
   value,
   onChange,
   includeAllOption = false,
-}) => {
+}: SelectFilterProps){
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) =>
     onChange(e.target.value);
 
