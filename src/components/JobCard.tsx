@@ -114,12 +114,6 @@ const JobCard: FC<JobCardProps> = ({
 
         <dt className="font-medium">Posted</dt>
         <dd>{postedDate}</dd>
-
-        <dt className="font-medium">Updated</dt>
-        <dd>{updatedDate}</dd>
-
-        <dt className="font-medium">Process Date</dt>
-        <dd>{processDate}</dd>
       </dl>
 
       {/* Job Description & Requirements */}
