@@ -4,7 +4,6 @@ import type { NYCJobType } from '../types'
 
 export interface JobCardProps {
   job: NYCJobType;
-  onLearnMore: (job: NYCJobType) => void;
   onFavorite: (job: NYCJobType) => void;
   onApplied: (job: NYCJobType) => void;
   isFavorited?: boolean;
@@ -27,7 +26,6 @@ const formatSalary = (from: string, to: string, freq: string) => {
 /* ───────────── Component ───────────── */
 const JobCard: FC<JobCardProps> = ({
   job,
-  onLearnMore,
   onFavorite,
   onApplied,
   isFavorited = false,
@@ -59,7 +57,7 @@ const JobCard: FC<JobCardProps> = ({
               'px-2 py-1 rounded-full',
               examRequired
                 ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-gray-100 text-gray-600',
+                : 'bg-green-200 text-green-800',
             )}
           >
             {examRequired ? 'Exam Required' : 'No Exam'}
@@ -146,12 +144,6 @@ const JobCard: FC<JobCardProps> = ({
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-4">
-        <button
-          onClick={() => onLearnMore(job)}
-          className="flex-1 rounded-lg bg-blue-600 text-white text-sm font-medium px-4 py-2 hover:bg-blue-700"
-        >
-          Learn More
-        </button>
 
         <button
           onClick={() => onFavorite(job)}
