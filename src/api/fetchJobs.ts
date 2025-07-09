@@ -1,11 +1,12 @@
-// src/api/nycJobs.ts
+
 import type { NYCJobType } from '../types';
 
 const ENDPOINT = 'https://data.cityofnewyork.us/resource/kpav-sd4t.json';
 const APP_TOKEN = import.meta.env.VITE_NYC_JOBS_APP_TOKEN as string;
+// while in dev we're only grabbing 10 jobs
+const retrievalLimit = 10;
 
-export async function fetchJobs(offset = 0, limit = 1_000): Promise<NYCJobType[]> {
-  console.log('Token in runtime:', APP_TOKEN);
+export async function fetchJobs(offset = 0, limit = retrievalLimit): Promise<NYCJobType[]> {
 
   const url = new URL(ENDPOINT);
   url.searchParams.set('$limit',  String(limit));
