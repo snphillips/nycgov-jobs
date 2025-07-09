@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import clsx from 'clsx';
-import type { NYCJobType } from '../types';
-
+import type { NYCJobType } from '../types'
 
 export interface JobCardProps {
   job: NYCJobType;
@@ -38,79 +37,115 @@ const JobCard: FC<JobCardProps> = ({
     job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time';
 
   const examRequired = isExamRequired(job.title_classification);
-  const postedDate   = new Date(job.posting_date).toLocaleDateString();
+  const postedDate = new Date(job.posting_date).toLocaleDateString();
+  const updatedDate = new Date(job.posting_updated).toLocaleDateString();
+  const processDate = new Date(job.process_date).toLocaleDateString();
 
   return (
-    <div className="rounded-2xl shadow-md p-6 bg-white flex flex-col gap-4">
-      {/* Header */}
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold leading-tight">
-            {job.business_title}
-          </h2>
-          <p className="text-sm text-gray-500">{job.agency}</p>
+    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b">
+      {/* Header Row */}
+      <header className="flex flex-col gap-1">
+        <h2 className="text-2xl font-semibold leading-tight">{job.business_title}</h2>
+        <p className="text-sm text-gray-500">{job.agency}</p>
+        <div className="flex flex-wrap gap-2 mt-2 text-xs">
+          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+            {job.job_category}
+          </span>
+          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+            {employmentType}
+          </span>
+          <span
+            className={clsx(
+              'px-2 py-1 rounded-full',
+              examRequired
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-600',
+            )}
+          >
+            {examRequired ? 'Exam Required' : 'No Exam'}
+          </span>
+          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+            {job.number_of_positions} Position{job.number_of_positions !== '1' && 's'}
+          </span>
         </div>
-
-        <span
-          className={clsx(
-            'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap',
-            employmentType === 'Full-Time'
-              ? 'bg-emerald-100 text-emerald-800'
-              : 'bg-sky-100 text-sky-800',
-          )}
-        >
-          {employmentType}
-        </span>
       </header>
 
-      {/* Badges */}
-      <div className="flex flex-wrap gap-2 text-xs">
-        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-          {job.job_category}
-        </span>
-        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-          Level {job.level} — {job.career_level}
-        </span>
-        <span
-          className={clsx(
-            'px-2 py-1 rounded-full',
-            examRequired
-              ? 'bg-yellow-100 text-yellow-800'
-              : 'bg-gray-100 text-gray-600',
-          )}
-        >
-          {examRequired ? 'Exam Required' : 'No Exam'}
-        </span>
-        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-          {job.number_of_positions} Position
-          {job.number_of_positions !== '1' && 's'}
-        </span>
-      </div>
+      {/* Details list */}
+      <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm text-gray-700">
+        <dt className="font-medium">Job ID</dt>
+        <dd>{job.job_id}</dd>
 
-      {/* Meta */}
-      <div className="text-sm text-gray-700 space-y-1">
-        <p>
-          <strong>Salary:</strong>{' '}
-          {formatSalary(job.salary_range_from, job.salary_range_to, job.salary_frequency)}
-        </p>
-        <p>
-          <strong>Location:</strong> {job.work_location}
-        </p>
-        <p>
-          <strong>Division:</strong> {job.division_work_unit}
-        </p>
-        <p>
-          <strong>Posted:</strong> {postedDate}
-        </p>
-      </div>
+        <dt className="font-medium">Posting Type</dt>
+        <dd>{job.posting_type}</dd>
 
-      {/* Snippet */}
-      <p className="text-sm text-gray-600 line-clamp-3">
-        <strong>Job Description:</strong> {job.job_description}
-      </p>
+        <dt className="font-medium">Civil Service Title</dt>
+        <dd>{job.civil_service_title}</dd>
+
+        <dt className="font-medium">Title Classification</dt>
+        <dd>{job.title_classification}</dd>
+
+        <dt className="font-medium">Title Code</dt>
+        <dd>{job.title_code_no}</dd>
+
+        <dt className="font-medium">Level</dt>
+        <dd>{job.level}</dd>
+
+        <dt className="font-medium">Career Level</dt>
+        <dd>{job.career_level}</dd>
+
+        <dt className="font-medium">Salary Range</dt>
+        <dd>{formatSalary(job.salary_range_from, job.salary_range_to, job.salary_frequency)}</dd>
+
+        <dt className="font-medium">Salary Frequency</dt>
+        <dd>{job.salary_frequency}</dd>
+
+        <dt className="font-medium">Work Location</dt>
+        <dd>{job.work_location}</dd>
+
+        <dt className="font-medium">Division / Unit</dt>
+        <dd>{job.division_work_unit}</dd>
+
+        <dt className="font-medium">Hours / Shift</dt>
+        <dd>{job.hours_shift}</dd>
+
+        <dt className="font-medium">Secondary Location</dt>
+        <dd>{job.work_location_1}</dd>
+
+        <dt className="font-medium">Residency Requirement</dt>
+        <dd>{job.residency_requirement}</dd>
+
+        <dt className="font-medium">Posted</dt>
+        <dd>{postedDate}</dd>
+
+        <dt className="font-medium">Updated</dt>
+        <dd>{updatedDate}</dd>
+
+        <dt className="font-medium">Process Date</dt>
+        <dd>{processDate}</dd>
+      </dl>
+
+      {/* Job Description & Requirements */}
+      <section className="space-y-3 text-sm text-gray-800">
+        <div>
+          <h3 className="font-medium mb-1">Job Description</h3>
+          <p className="whitespace-pre-line">{job.job_description}</p>
+        </div>
+        {job.minimum_qual_requirements && (
+          <div>
+            <h3 className="font-medium mb-1">Minimum Qualifications</h3>
+            <p className="whitespace-pre-line">{job.minimum_qual_requirements}</p>
+          </div>
+        )}
+        {job.to_apply && (
+          <div>
+            <h3 className="font-medium mb-1">How to Apply</h3>
+            <p className="whitespace-pre-line">{job.to_apply}</p>
+          </div>
+        )}
+      </section>
 
       {/* Actions */}
-      <div className="mt-auto flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 pt-4">
         <button
           onClick={() => onLearnMore(job)}
           className="flex-1 rounded-lg bg-blue-600 text-white text-sm font-medium px-4 py-2 hover:bg-blue-700"
@@ -143,7 +178,7 @@ const JobCard: FC<JobCardProps> = ({
           {isApplied ? 'Applied' : 'Apply'}
         </button>
       </div>
-    </div>
+    </section>
   );
 };
 

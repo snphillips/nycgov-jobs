@@ -19,11 +19,12 @@ export interface NYCJobType {
   job_description: string;
   preferred_skills?: string;
   minimum_qual_requirements: string;
-  to_apply: string;
-  hours_shift: string;
-  work_location_1: string;
+  to_apply?: string;
+  hours_shift?: string;
+  work_location_1?: string;
   residency_requirement: string;
   posting_date: string;         // ISO – e.g. “2024-06-13T00:00:00.000”
+  post_until?: string,
   posting_updated: string;
   process_date: string;
 }
