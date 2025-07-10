@@ -11,10 +11,9 @@ export function App() {
   const [applied, setApplied]     = useState<Set<string>>(new Set());
 
   /* ─────────── Filters ─────────── */
-  const [employmentKindFilter, setEmploymentKindFilter] = useState('all'); // 'F' | 'P' | 'all'
-  const [salaryFrequencyFilter, setSalaryFrequencyFilter] = useState('all'); // 'Annual' | 'Hourly' | 'all'
-  // const [agencyFilter, setAgencyFilter] = useState('all');
-  // const [titleClassFilter, setTitleClassFilter] = useState('all');
+  const [selectedEmploymentKind, setSelectedEmploymentKind] = useState<string[]>([]);
+  const [selectedSalaryFrequency, setSelectedSalaryFrequency] = useState<string[]>([]);
+  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
   
 
   const toggleFavorite = (job: NYCJobType) => {
@@ -32,17 +31,54 @@ export function App() {
   const markApplied = (job: NYCJobType) =>
     setApplied((prev) => new Set(prev).add(job.job_id));
 
+    /* ─────────── Deduplicate rows by job_id ─────────── */
+  const uniqueJobs = useMemo(() => {
+    const map = new Map<string, NYCJobType>();
+    jobs.forEach((job) => {
+      const existing = map.get(job.job_id);
+      if (!existing || new Date(job.posting_updated) > new Date(existing.posting_updated)) {
+        map.set(job.job_id, job);
+      }
+    });
+    return Array.from(map.values());
+  }, [jobs]);
+
+
     /* ─────────── Apply filters ─────────── */
   const filteredJobs = useMemo(() => {
-    return jobs.filter((j) => {
-      if (employmentKindFilter !== 'all' && j.full_time_part_time_indicator !== employmentKindFilter) return false;
-      if (salaryFrequencyFilter !== 'all' && j.salary_frequency !== salaryFrequencyFilter) return false;
-      // if (agencyFilter !== 'all' && j.agency !== agencyFilter) return false;
-      // if (titleClassFilter !== 'all' && j.title_classification !== titleClassFilter) return false;
+    const results = uniqueJobs.filter((job) => {
+      if (
+        selectedEmploymentKind.length > 0 &&
+        !selectedEmploymentKind.includes(job.full_time_part_time_indicator)
+      ) return false;
+
+      if (
+        selectedSalaryFrequency.length > 0 &&
+        !selectedSalaryFrequency.includes(job.salary_frequency)
+      ) return false;
+
+      if (
+        selectedAgencies.length > 0 &&
+        !selectedAgencies.includes(job.agency)
+      ) return false;
+
       return true;
     });
-  }, [jobs, employmentKindFilter, salaryFrequencyFilter]);
 
+    console.log('Filtered Jobs:', results.length);
+    console.log({
+      selectedEmploymentKind,
+      selectedSalaryFrequency,
+      selectedAgencies,
+    });
+
+    return results;
+  }, [
+    uniqueJobs,
+    selectedEmploymentKind,
+    selectedSalaryFrequency,
+    selectedAgencies,
+  ]);
 
 
     if (loading) return <p className="p-6">Loading NYC job listings…</p>;
@@ -52,11 +88,12 @@ export function App() {
     <>
     <h1>nyc gov jobs</h1>
     <FilterBar
-      employmentKindFilter={employmentKindFilter}
-      setEmploymentKindFilter={setEmploymentKindFilter}
-      salaryFrequencyFilter={salaryFrequencyFilter}
-      setSalaryFrequencyFilter={setSalaryFrequencyFilter}
-      // agency={agencyFilter} 
+      selectedEmploymentKind={selectedEmploymentKind}
+      setSelectedEmploymentKind={setSelectedEmploymentKind}
+      selectedSalaryFrequency={selectedSalaryFrequency}
+      setSelectedSalaryFrequency={setSelectedSalaryFrequency}
+      selectedAgencies={selectedAgencies} 
+      setSelectedAgencies={setSelectedAgencies}
       // titleClassification={titleClassFilter}
       // employmentOptions={employmentOptions}
       // salaryOptions={salaryOptions}
