@@ -14,6 +14,7 @@ export function App() {
   const [selectedEmploymentKind, setSelectedEmploymentKind] = useState<string[]>([]);
   const [selectedSalaryFrequency, setSelectedSalaryFrequency] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
+  const [selectedTitleClassification, setSelectedTitleClassification] = useState<string[]>([]);
   
 
   const toggleFavorite = (job: NYCJobType) => {
@@ -56,11 +57,15 @@ export function App() {
   return Array.from(map.values());
 }, [jobs]);
 
-
-
-  // Apply checkbox filters 
   const filteredJobs = useMemo(() => {
-    const results = uniqueJobs.filter((job) => {
+    const NON_EXAM_CLASSES = [
+      'Pending Classification-2',
+      'Labor-3',
+      'Exempt-4',
+      'Non-Competitive-5',
+    ];
+
+    return uniqueJobs.filter((job) => {
       if (
         selectedEmploymentKind.length > 0 &&
         !selectedEmploymentKind.includes(job.full_time_part_time_indicator)
@@ -76,17 +81,27 @@ export function App() {
         !selectedAgencies.includes(job.agency)
       ) return false;
 
+      if (
+        selectedTitleClassification.length > 0 &&
+        !(
+          // either it's a match for the classification 'Competitive-1'
+          selectedTitleClassification.includes(job.title_classification) ||
+          // OR the user selected "no-exam", and job is in the no-exam group
+          (selectedTitleClassification.includes('no-exam') &&
+          NON_EXAM_CLASSES.includes(job.title_classification))
+        )
+      ) return false;
+
       return true;
     });
-    console.log('Filtered Jobs:', results.length);
-
-    return results;
   }, [
     uniqueJobs,
     selectedEmploymentKind,
     selectedSalaryFrequency,
     selectedAgencies,
+    selectedTitleClassification
   ]);
+
 
 
     if (loading) return <p className="p-6">Loading NYC job listings…</p>;
@@ -102,7 +117,8 @@ export function App() {
       setSelectedSalaryFrequency={setSelectedSalaryFrequency}
       selectedAgencies={selectedAgencies} 
       setSelectedAgencies={setSelectedAgencies}
-      // titleClassification={titleClassFilter}
+      selectedTitleClassification={selectedTitleClassification}
+      setSelectedTitleClassification={setSelectedTitleClassification}
       // employmentOptions={employmentOptions}
       // salaryOptions={salaryOptions}
       // agencyOptions={agencyOptions}

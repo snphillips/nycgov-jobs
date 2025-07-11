@@ -7,6 +7,8 @@ interface FilterBarProps {
   setSelectedSalaryFrequency: React.Dispatch<React.SetStateAction<string[]>>;
   selectedAgencies: string[];
   setSelectedAgencies: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedTitleClassification: string[];
+  setSelectedTitleClassification: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 
@@ -16,7 +18,9 @@ export function FilterBar({
   selectedSalaryFrequency,
   setSelectedSalaryFrequency,
   selectedAgencies,
-  setSelectedAgencies
+  setSelectedAgencies,
+  selectedTitleClassification,
+  setSelectedTitleClassification
 
 }: FilterBarProps ) {
 
@@ -24,6 +28,16 @@ export function FilterBar({
     <section className="bg-gray-200 p-4 md:p-6 shadow-sm mb-6">
       <h2 className="text-lg font-semibold mb-4 text-gray-800">Filter Jobs</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
+      <CheckboxFilter
+        id="title_classification"
+        label="Civil Exam Required"
+        options={[
+          { value: 'Competitive-1', label: 'yes' },
+          { value: 'no-exam', label: 'no' },
+        ]}
+        selected={selectedTitleClassification}
+        onChange={setSelectedTitleClassification}
+      />
       <CheckboxFilter
         id="employmentType"
         label="Employment Type"
