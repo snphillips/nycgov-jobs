@@ -31,20 +31,34 @@ export function App() {
   const markApplied = (job: NYCJobType) =>
     setApplied((prev) => new Set(prev).add(job.job_id));
 
-    /* ─────────── Deduplicate rows by job_id ─────────── */
+  // Deduplicate rows by job_id 
+  // I don't know why, but the data contains duplicate jobs
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>();
+    let duplicateCount = 0;
+
     jobs.forEach((job) => {
       const existing = map.get(job.job_id);
-      if (!existing || new Date(job.posting_updated) > new Date(existing.posting_updated)) {
+
+      if (!existing) {
         map.set(job.job_id, job);
+      } else {
+        // Check if this job is more recent than the existing one
+        const isNewer = new Date(job.posting_updated) > new Date(existing.posting_updated);
+        if (isNewer) {
+          map.set(job.job_id, job);
+        }
+        duplicateCount++;
       }
     });
-    return Array.from(map.values());
-  }, [jobs]);
+
+  console.log(`🧹 Removed ${duplicateCount} duplicate job postings.`);
+  return Array.from(map.values());
+}, [jobs]);
 
 
-    /* ─────────── Apply filters ─────────── */
+
+  // Apply checkbox filters 
   const filteredJobs = useMemo(() => {
     const results = uniqueJobs.filter((job) => {
       if (
@@ -64,13 +78,7 @@ export function App() {
 
       return true;
     });
-
     console.log('Filtered Jobs:', results.length);
-    console.log({
-      selectedEmploymentKind,
-      selectedSalaryFrequency,
-      selectedAgencies,
-    });
 
     return results;
   }, [
@@ -86,7 +94,7 @@ export function App() {
 
   return (
     <>
-    <h1>nyc gov jobs</h1>
+    <h1 className='block p-6'>nyc gov jobs</h1>
     <FilterBar
       selectedEmploymentKind={selectedEmploymentKind}
       setSelectedEmploymentKind={setSelectedEmploymentKind}

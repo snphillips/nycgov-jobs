@@ -34,14 +34,14 @@ function JobCard({
 
   const examRequired = isExamRequired(job.title_classification);
   const postedDate = new Date(job.posting_date).toLocaleDateString();
-  const updatedDate = new Date(job.posting_updated).toLocaleDateString();
-  const processDate = new Date(job.process_date).toLocaleDateString();
+  // const updatedDate = new Date(job.posting_updated).toLocaleDateString();
+  // const processDate = new Date(job.process_date).toLocaleDateString();
 
   return (
     <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b">
       {/* Header Row */}
       <header className="flex flex-col gap-1">
-        <h2 className="text-2xl font-semibold leading-tight">{job.business_title}</h2>
+        <h2 className="text-2xl font-semibold leading-tight text-amber-950">{job.business_title}</h2>
         <p className="text-sm text-gray-500">{job.agency}</p>
         <div className="flex flex-wrap gap-2 mt-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
@@ -68,6 +68,9 @@ function JobCard({
 
       {/* Details list */}
       <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm text-gray-700">
+        <dt className="font-medium">Date Posted</dt>
+        <dd>{postedDate}</dd>
+        
         <dt className="font-medium">Job ID</dt>
         <dd>{job.job_id}</dd>
 
@@ -109,9 +112,6 @@ function JobCard({
 
         <dt className="font-medium">Residency Requirement</dt>
         <dd>{job.residency_requirement}</dd>
-
-        <dt className="font-medium">Posted</dt>
-        <dd>{postedDate}</dd>
       </dl>
 
       {/* Job Description & Requirements */}

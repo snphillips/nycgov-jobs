@@ -1,13 +1,14 @@
 import CheckboxFilter from './CheckboxFilter';
 
 interface FilterBarProps {
-  selectedEmploymentKind: any;
-  setSelectedEmploymentKind: any;
-  selectedSalaryFrequency: any;
-  setSelectedSalaryFrequency: any;
-  selectedAgencies: any;
-  setSelectedAgencies: any;
+  selectedEmploymentKind: string[];
+  setSelectedEmploymentKind: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedSalaryFrequency: string[];
+  setSelectedSalaryFrequency: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedAgencies: string[];
+  setSelectedAgencies: React.Dispatch<React.SetStateAction<string[]>>;
 }
+
 
 export function FilterBar({
   selectedEmploymentKind,
@@ -20,7 +21,9 @@ export function FilterBar({
 }: FilterBarProps ) {
 
   return(
-    <>
+    <section className="bg-gray-200 p-4 md:p-6 shadow-sm mb-6">
+      <h2 className="text-lg font-semibold mb-4 text-gray-800">Filter Jobs</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
       <CheckboxFilter
         id="employmentType"
         label="Employment Type"
@@ -112,6 +115,8 @@ export function FilterBar({
         selected={selectedAgencies}
         onChange={setSelectedAgencies}
       />
-    </>
+
+          </div>
+    </section>
   )
 };

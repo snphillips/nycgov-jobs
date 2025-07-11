@@ -7,7 +7,7 @@ export function useNYCJobs() {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   // while in dev we're only grabbing a smaller number of jobs
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 100;
 
   useEffect(() => {
     let abort = false;
