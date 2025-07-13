@@ -3,14 +3,15 @@ import CheckboxFilter from './CheckboxFilter';
 interface FilterBarProps {
   selectedEmploymentKind: string[];
   setSelectedEmploymentKind: React.Dispatch<React.SetStateAction<string[]>>;
-  employmentKindOptions: any;
+  employmentKindOptions: any[];
   selectedSalaryFrequency: string[];
   setSelectedSalaryFrequency: React.Dispatch<React.SetStateAction<string[]>>;
   selectedAgencies: string[];
   setSelectedAgencies: React.Dispatch<React.SetStateAction<string[]>>;
-  agencyOptions: any;
+  agencyFilterOptions: any[];
   selectedTitleClassification: string[];
   setSelectedTitleClassification: React.Dispatch<React.SetStateAction<string[]>>;
+  titleClassificationOptions: any[];
 }
 
 
@@ -22,9 +23,10 @@ export function FilterBar({
   setSelectedSalaryFrequency,
   selectedAgencies,
   setSelectedAgencies,
-  agencyOptions,
+  agencyFilterOptions,
   selectedTitleClassification,
-  setSelectedTitleClassification
+  setSelectedTitleClassification,
+  titleClassificationOptions
 
 }: FilterBarProps ) {
 
@@ -34,11 +36,8 @@ export function FilterBar({
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
       <CheckboxFilter
         id="title_classification"
-        label="Civil Exam Required"
-        options={[
-          { value: 'Competitive-1', label: 'yes', count: 420 },
-          { value: 'no-exam', label: 'no', count: 420 },
-        ]}
+        label="Exam Required"
+        options={titleClassificationOptions}
         selected={selectedTitleClassification}
         onChange={setSelectedTitleClassification}
       />
@@ -63,12 +62,12 @@ export function FilterBar({
       <CheckboxFilter
         id="agency"
         label="Agency"
-        options={agencyOptions}
+        options={agencyFilterOptions}
         selected={selectedAgencies}
         onChange={setSelectedAgencies}
       />
 
-          </div>
+      </div>
     </section>
   )
 };

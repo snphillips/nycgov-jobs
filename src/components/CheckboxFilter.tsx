@@ -66,7 +66,7 @@ function CheckboxFilter({
                 onChange={() => toggleOption(option.value)}
                 className="rounded border-gray-300 focus:ring-blue-500"
               />
-              {option.label} ({option.count} jobs)
+              {option.label} ({option.count})
             </label>
           ))}
         </div>
