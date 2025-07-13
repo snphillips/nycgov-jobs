@@ -3,6 +3,7 @@ import { useState } from 'react';
 interface Option {
   value: string;
   label: string;
+  count?: number;
 }
 
 interface CheckboxFilterProps {
@@ -65,7 +66,7 @@ function CheckboxFilter({
                 onChange={() => toggleOption(option.value)}
                 className="rounded border-gray-300 focus:ring-blue-500"
               />
-              {option.label}
+              {option.label} ({option.count} jobs)
             </label>
           ))}
         </div>
