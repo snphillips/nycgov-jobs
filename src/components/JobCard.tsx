@@ -37,20 +37,18 @@ function JobCard({
 
   const examRequired = isExamRequired(job.title_classification);
   const postedDate = new Date(job.posting_date).toLocaleDateString();
-  // const updatedDate = new Date(job.posting_updated).toLocaleDateString();
-  // const processDate = new Date(job.process_date).toLocaleDateString();
 
   return (
     <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b">
       <div className="relative p-2">
       {/* Heart Favorite Button */}
         <button
-          className="favorite-button absolute inline-block top-1 right-1 p-1 bg-transparent border-none text-gray-400 hover:text-red-400 focus:outline-none"
+          className="favorite-button absolute p-0! top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none"
           onClick={() => onFavorite(job)}
           aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
         >
           {isFavorited ? (
-            <SolidHeart className="h-6 w-6 text-red-400" />
+            <SolidHeart className="h-6 w-6 text-red-600" />
           ) : (
             <SolidHeart className="h-6 w-6" />
           )}
