@@ -178,6 +178,7 @@ const titleClassificationOptions = useMemo(() => {
   return (
     <>
     <h1 className='block p-6'>nyc gov job search</h1>
+    <div role="doc-subtitle" className='pl-6 pb-6'>Search for nyc.gov jobs with better filtering</div>
     <FilterBar
       selectedEmploymentKind={selectedEmploymentKind}
       setSelectedEmploymentKind={setSelectedEmploymentKind}
@@ -197,7 +198,7 @@ const titleClassificationOptions = useMemo(() => {
       // onTitleClassChange={setTitleClassFilter}
     />
 
-    <h2 className="text-lg font-semibold mb-4 text-gray-300 p-6">{filteredJobs.length} Jobs</h2>
+    <h2 className="text-lg font-semibold mb-4 text-gray-300 p-6">{filteredJobs.length} jobs match your criteria</h2>
     <main className="grid gap-6 p-6 sm:grid-cols-2 xl:grid-cols-4 bg-gray-50 min-h-screen">
       {filteredJobs.map((job) => (
         <JobCard

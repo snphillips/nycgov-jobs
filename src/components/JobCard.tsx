@@ -120,12 +120,21 @@ function JobCard({
 
         <dt className="font-medium">Division / Unit</dt>
         <dd>{job.division_work_unit}</dd>
+        <>
+          {job.hours_shift && (
+            <>
+              <dt className="font-medium">Hours / Shift</dt>
+              <dd>{job.hours_shift}</dd>
+            </>
+          )}
 
-        <dt className="font-medium">Hours / Shift</dt>
-        <dd>{job.hours_shift}</dd>
-
-        <dt className="font-medium">Secondary Location</dt>
-        <dd>{job.work_location_1}</dd>
+          {job.work_location_1 && (
+            <>
+              <dt className="font-medium">Secondary Location</dt>
+              <dd>{job.work_location_1}</dd>
+            </>
+          )}
+        </>
       </dl>
 
       {/* Job Description & Requirements */}
