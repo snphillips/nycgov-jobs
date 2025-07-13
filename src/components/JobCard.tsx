@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import type { NYCJobType } from '../types'
 import { cleanText } from '../utils.ts'
+import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid';
+
 
 interface JobCardProps {
   job: NYCJobType;
@@ -40,9 +42,25 @@ function JobCard({
 
   return (
     <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b">
+      <div className="relative p-2">
+      {/* Heart Favorite Button */}
+        <button
+          className="favorite-button absolute inline-block top-1 right-1 p-1 bg-transparent border-none text-gray-400 hover:text-red-400 focus:outline-none"
+          onClick={() => onFavorite(job)}
+          aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
+        >
+          {isFavorited ? (
+            <SolidHeart className="h-6 w-6 text-red-400" />
+          ) : (
+            <SolidHeart className="h-6 w-6" />
+          )}
+        </button>
+    </div>
+
+
       {/* Header Row */}
       <header className="flex flex-col gap-1">
-        <h2 className="text-2xl font-semibold leading-tight text-amber-950">{job.business_title}</h2>
+        <h3 className="text-2xl font-semibold leading-tight text-amber-950">{job.business_title}</h3>
         <p className="text-sm text-gray-500">{job.agency}</p>
         <div className="flex flex-wrap gap-2 mt-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
@@ -110,27 +128,29 @@ function JobCard({
 
         <dt className="font-medium">Secondary Location</dt>
         <dd>{job.work_location_1}</dd>
-
-        <dt className="font-medium">Residency Requirement</dt>
-        <dd>{job.residency_requirement}</dd>
       </dl>
 
       {/* Job Description & Requirements */}
       <section className="space-y-3 text-sm text-gray-800">
+      <div>
+        <h5 className="font-medium mb-1">Residency Requirement</h5>
+        <p className="whitespace-pre-line">{cleanText(job.residency_requirement)}</p>
+      </div>
+        
         <div>
-          <h3 className="font-medium mb-1">Job Description</h3>
+          <h5 className="font-medium mb-1">Job Description</h5>
           <p className="whitespace-pre-line">{cleanText(job.job_description)}</p>
         </div>
         {job.minimum_qual_requirements && (
           <div>
-            <h3 className="font-medium mb-1">Minimum Qualifications</h3>
-            <p className="whitespace-pre-line">{job.minimum_qual_requirements}</p>
+            <h5 className="font-medium mb-1">Minimum Qualifications</h5>
+            <p className="whitespace-pre-line">{cleanText(job.minimum_qual_requirements)}</p>
           </div>
         )}
         {job.to_apply && (
           <div>
-            <h3 className="font-medium mb-1">How to Apply</h3>
-            <p className="whitespace-pre-line">{job.to_apply}</p>
+            <h5 className="font-medium mb-1">How to Apply</h5>
+            <p className="whitespace-pre-line">{cleanText(job.to_apply)}</p>
           </div>
         )}
       </section>
@@ -138,17 +158,6 @@ function JobCard({
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-4">
 
-        <button
-          onClick={() => onFavorite(job)}
-          className={clsx(
-            'text-sm font-medium rounded-lg px-4 py-2 border',
-            isFavorited
-              ? 'bg-red-100 text-red-600 border-red-200'
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50',
-          )}
-        >
-          {isFavorited ? 'Favorited' : 'Favorite'}
-        </button>
 
         <button
           onClick={() => onApplied(job)}

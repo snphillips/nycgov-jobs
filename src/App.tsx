@@ -171,14 +171,7 @@ const titleClassificationOptions = useMemo(() => {
   ];
 }, [uniqueJobs]);
 
-
-
-
-
-
-
-
-
+ 
     if (loading) return <p className="p-6">Loading NYC job listings…</p>;
     if (error)   return <p className="p-6 text-red-600">Error: {error.message}</p>;
 
@@ -204,6 +197,7 @@ const titleClassificationOptions = useMemo(() => {
       // onTitleClassChange={setTitleClassFilter}
     />
 
+    <h2 className="text-lg font-semibold mb-4 text-gray-300 p-6">{filteredJobs.length} Jobs</h2>
     <main className="grid gap-6 p-6 sm:grid-cols-2 xl:grid-cols-4 bg-gray-50 min-h-screen">
       {filteredJobs.map((job) => (
         <JobCard
