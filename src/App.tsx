@@ -3,7 +3,7 @@ import JobCard from './components/JobCard';
 import type { NYCJobType } from './types'
 import { useNYCJobs } from './hooks/useNYCJobs';
 import { FilterBar } from './components/FilterBar';
-import toTitleCase from "./utils/utils"
+import { toTitleCase}  from "./utils"
 
 const NON_EXAM_CLASSES = [
   'Pending Classification-2',

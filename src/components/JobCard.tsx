@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { NYCJobType } from '../types'
+import { cleanText } from '../utils.ts'
 
 interface JobCardProps {
   job: NYCJobType;
@@ -118,7 +119,7 @@ function JobCard({
       <section className="space-y-3 text-sm text-gray-800">
         <div>
           <h3 className="font-medium mb-1">Job Description</h3>
-          <p className="whitespace-pre-line">{job.job_description}</p>
+          <p className="whitespace-pre-line">{cleanText(job.job_description)}</p>
         </div>
         {job.minimum_qual_requirements && (
           <div>
