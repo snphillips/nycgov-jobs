@@ -7,7 +7,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #1d130e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -33,16 +33,16 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 3em;
+  line-height: 1;
 }
 
 h2 {
-  font-size: 2em;
+  font-size: 1.6em;
 }
 
 h3 {
-  font-size: 1.6em;
+  font-size: 1.4em;
   margin-bottom: 6px;
   margin-top: 6px;
 }

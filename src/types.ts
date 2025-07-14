@@ -18,6 +18,7 @@ export interface NYCJobType {
   division_work_unit: string;
   job_description: string;
   preferred_skills?: string;
+  additional_information?: string;
   minimum_qual_requirements: string;
   to_apply?: string;
   hours_shift?: string;

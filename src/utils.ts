@@ -1,3 +1,5 @@
+import type { NYCJobType } from "./types";
+
 export function toTitleCase(input: string) {
   return input
     .toLowerCase()
@@ -18,7 +20,20 @@ export function cleanText(text: string): string {
     .replace(/â/g, '”')    // right double quote
     .replace(/â”/g, '—')    // em dash
     .replace(/â¦/g, '…')    // ellipsis
-    .replace(/â/g, `'`);    // fallback apostrophe
+    .replace(/â/g, `'`)    // fallback apostrophe
+    .replace(/(\d+\.)\s*/g, '\n$1 '); // ← key line: adds a line break before 1. 2. etc.
 }
 
 
+export function isInternalJob(job: NYCJobType): boolean {
+  const combinedText = [
+    job.job_description,
+    job.additional_information,
+    job.to_apply,
+  ]
+    .join(' ')
+    .toLowerCase();
+
+    const internalRegex = /open\s+to\s+.*?\s+employees\s+only|for\s+.*?\s+employees\s+only|only\s+permanent\s+employees\s+in\s+the\s+title|open\s+to\s+current\s+employees\s+only|restricted\s+to\s+.*?\s+employees/;
+  return internalRegex.test(combinedText);
+}

@@ -7,23 +7,23 @@ export function useNYCJobs() {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   // while in dev we're only grabbing a smaller number of jobs
-  const PAGE_SIZE = 200;
+  const RETRIEVAL_LIMIT = 100;
 
   useEffect(() => {
     let abort = false;
 
     (async () => {
       try {
-        const firstPage = await fetchJobs(0,PAGE_SIZE);
+        const firstPage = await fetchJobs(0,RETRIEVAL_LIMIT);
         if (abort) return;
 
         // If there are more than 1000, pull additional pages
         const total   = firstPage.length;
-        const pages   = Math.ceil(total / PAGE_SIZE);
+        const pages   = Math.ceil(total / RETRIEVAL_LIMIT);
         const allJobs = [...firstPage];
 
         for (let p = 1; p < pages; p++) {
-          const chunk = await fetchJobs(p * PAGE_SIZE);
+          const chunk = await fetchJobs(p * RETRIEVAL_LIMIT);
           if (abort) return;
           allJobs.push(...chunk);
         }

@@ -15,7 +15,7 @@ const NON_EXAM_CLASSES = [
 
 export function App() {
   const { jobs, loading, error } = useNYCJobs(); 
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(new Set());
   const [applied, setApplied]     = useState<Set<string>>(new Set());
 
   /* ─────────── Filters ─────────── */
@@ -23,10 +23,12 @@ export function App() {
   const [selectedSalaryFrequency, setSelectedSalaryFrequency] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
   const [selectedTitleClassification, setSelectedTitleClassification] = useState<string[]>([]);
+  const [selectedPostingType, setSelectedPostingType] = useState<string[]>([]);
+
   
 
   const toggleFavorite = (job: NYCJobType) => {
-    setFavorites(prev => {
+    setFavoriteJobs(prev => {
       const next = new Set(prev);
       if (next.has(job.job_id)) {
         next.delete(job.job_id);
@@ -86,6 +88,11 @@ export function App() {
       ) return false;
 
       if (
+        selectedPostingType.length > 0 &&
+        !selectedPostingType.includes(job.posting_type)
+      ) return false;
+
+      if (
         selectedTitleClassification.length > 0 &&
         !(
           // either it's a match for the classification 'Competitive-1'
@@ -104,6 +111,7 @@ export function App() {
     selectedSalaryFrequency,
     selectedAgencies,
     selectedTitleClassification,
+    selectedPostingType
   ]);
 
   // ==============================
@@ -121,26 +129,47 @@ export function App() {
     { value: 'F', label: 'Full-Time', count: employmentCounts['F'] || 0 },
     { value: 'P', label: 'Part-Time', count: employmentCounts['P'] || 0 },
   ];
+  // ==============================
 
   // ==============================
   // Agency Filter Options
   // ============================== 
-const agencyFilterOptions = useMemo(() => {
-  const counts: Record<string, number> = {};
+  const agencyFilterOptions = useMemo(() => {
+    const counts: Record<string, number> = {};
 
-  uniqueJobs.forEach((job) => {
-    if (!job.agency) return;
-    counts[job.agency] = (counts[job.agency] || 0) + 1;
-  });
+    uniqueJobs.forEach((job) => {
+      if (!job.agency) return;
+      counts[job.agency] = (counts[job.agency] || 0) + 1;
+    });
 
-  return Object.entries(counts)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([agency, count]) => ({
-      value: agency,
-      label: toTitleCase(agency),
-      count,
-    }));
-}, [uniqueJobs]);
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([agency, count]) => ({
+        value: agency,
+        label: toTitleCase(agency),
+        count,
+      }));
+  }, [uniqueJobs]);
+  // ==============================
+
+  // ==============================
+  // Salary Frequency Options
+  // ============================== 
+   const salaryFrequencyCounts = useMemo(() => {  
+      const map: Record<string, number> = {};
+      uniqueJobs.forEach((job) => {
+        map[job.salary_frequency] = (map[job.salary_frequency] || 0) + 1;
+      });
+      return map;
+    }, [uniqueJobs]);
+    
+    const salaryFrequencyOptions =   [
+      { value: 'Annual', label: 'Annual', count: salaryFrequencyCounts['Annual'] || 0 },
+      { value: 'Hourly', label: 'Hourly', count: salaryFrequencyCounts['Hourly'] || 0},
+      { value: 'Daily', label: 'Daily', count: salaryFrequencyCounts['Daily'] || 0},
+    ]
+    // ==============================
+
 
   // ==============================
   // Civil Service Exam Options
@@ -170,6 +199,27 @@ const titleClassificationOptions = useMemo(() => {
     { value: 'no-exam', label: 'No', count: noExamCount },
   ];
 }, [uniqueJobs]);
+// ==============================
+
+
+    // ==============================
+    // Employment Kind (Internal/External) Filter Options
+    // ==============================
+    const postingTypeCounts = useMemo(() => {  
+      const map: Record<string, number> = {};
+      uniqueJobs.forEach((job) => {
+        map[job.posting_type] = (map[job.posting_type] || 0) + 1;
+      });
+      return map;
+    }, [uniqueJobs]);
+    
+    const postingTypeOptions = [
+      {value: 'Internal', label: 'Internal', count: postingTypeCounts['Internal'] || 0},
+      {value: 'External', label: 'External', count: postingTypeCounts['External'] || 0},
+    ]
+    // ==============================
+
+
 
  
     if (loading) return <p className="p-6">Loading NYC job listings…</p>;
@@ -178,27 +228,30 @@ const titleClassificationOptions = useMemo(() => {
   return (
     <>
     <h1 className='block p-6'>nyc gov job search</h1>
-    <div role="doc-subtitle" className='pl-6 pb-6'>Search for nyc.gov jobs with better filtering</div>
+    <div role="doc-subtitle" className='pl-6 pb-6 font-semibold'>Search for nyc.gov jobs</div>
     <FilterBar
       selectedEmploymentKind={selectedEmploymentKind}
       setSelectedEmploymentKind={setSelectedEmploymentKind}
-      selectedSalaryFrequency={selectedSalaryFrequency}
-      setSelectedSalaryFrequency={setSelectedSalaryFrequency}
+      employmentKindOptions={employmentKindOptions}
+
       selectedAgencies={selectedAgencies} 
       setSelectedAgencies={setSelectedAgencies}
+      agencyFilterOptions={agencyFilterOptions}
+      
       selectedTitleClassification={selectedTitleClassification}
       setSelectedTitleClassification={setSelectedTitleClassification}
       titleClassificationOptions={titleClassificationOptions}
-      employmentKindOptions={employmentKindOptions}
-      // salaryOptions={salaryOptions}
-      agencyFilterOptions={agencyFilterOptions}
-      // titleClassOptions={titleClassOptions}
-      // onEmploymentChange={setEmploymentFilter}
-      // onAgencyChange={setAgencyFilter}
-      // onTitleClassChange={setTitleClassFilter}
-    />
+      
+      selectedPostingType={selectedPostingType}
+      setSelectedPostingType={setSelectedPostingType}
+      postingTypeOptions={postingTypeOptions}
+      
+      selectedSalaryFrequency={selectedSalaryFrequency}
+      setSelectedSalaryFrequency={setSelectedSalaryFrequency}
+      salaryFrequencyOptions={salaryFrequencyOptions}
+      />
 
-    <h2 className="text-lg font-semibold mb-4 text-gray-300 p-6">{filteredJobs.length} jobs match your criteria</h2>
+    <h2 className="text-lg font-semibold mb-4 text-center text-gray-300 p-3">{filteredJobs.length} jobs match your criteria</h2>
     <main className="grid gap-6 p-6 sm:grid-cols-2 xl:grid-cols-4 bg-gray-50 min-h-screen">
       {filteredJobs.map((job) => (
         <JobCard
@@ -206,7 +259,7 @@ const titleClassificationOptions = useMemo(() => {
           job={job}
           onFavorite={toggleFavorite}
           onApplied={markApplied}
-          isFavorited={favorites.has(job.job_id)}
+          isFavorited={favoriteJobs.has(job.job_id)}
           isApplied={applied.has(job.job_id)}
         />
       ))}
