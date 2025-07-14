@@ -4,7 +4,7 @@ import type { NYCJobType } from '../types'
 interface FavoritesProps {
   toggleFavorite: () => void;
   markApplied: () => void;
-  favoriteJobs: NYCJobType[];
+  favoriteJobs: any;
 }
 
 export default function Favorites({
@@ -16,7 +16,7 @@ export default function Favorites({
   return(
 
     <div>
-      {favoriteJobs.map((job) => (
+      {favoriteJobs.map((job: NYCJobType) => (
         <JobCard
           key={`${job.job_id}-${job.posting_updated}`}
           job={job}

@@ -252,18 +252,19 @@ const titleClassificationOptions = useMemo(() => {
       />
 
     <h2 className="text-lg font-semibold mb-4 text-center text-gray-300 p-3">{filteredJobs.length} jobs match your criteria</h2>
-    <main className="grid gap-6 p-6 sm:grid-cols-2 xl:grid-cols-4 bg-gray-50 min-h-screen">
-      {filteredJobs.map((job) => (
-        <JobCard
-          key={`${job.job_id}-${job.posting_updated}`}
-          job={job}
-          onFavorite={toggleFavorite}
-          onApplied={markApplied}
-          isFavorited={favoriteJobs.has(job.job_id)}
-          isApplied={applied.has(job.job_id)}
-        />
-      ))}
-    </main>
+<main className="columns-1 sm:columns-2 xl:columns-4 gap-6 p-6 bg-gray-50">
+  {filteredJobs.map((job) => (
+    <div key={`${job.job_id}-${job.posting_updated}`} className="mb-6 break-inside-avoid">
+      <JobCard
+        job={job}
+        onFavorite={toggleFavorite}
+        onApplied={markApplied}
+        isFavorited={favoriteJobs.has(job.job_id)}
+        isApplied={applied.has(job.job_id)}
+      />
+    </div>
+  ))}
+</main>
     </>
   );
 };
