@@ -1,22 +1,20 @@
-import JobCard  from '../components/JobCard'
+import JobCard from '../components/JobCard'
 import type { NYCJobType } from '../types'
 
 interface FavoritesProps {
-  toggleFavorite: () => void;
-  markApplied: () => void;
-  favoriteJobs: any;
-  applied: any;
+  toggleFavorite: () => void
+  markApplied: () => void
+  favoriteJobs: any
+  applied: any
 }
 
 export default function Favorites({
   toggleFavorite,
   markApplied,
   favoriteJobs,
-  applied
-}:FavoritesProps ) {
-
-  return(
-
+  applied,
+}: FavoritesProps) {
+  return (
     <div>
       {favoriteJobs.map((job: NYCJobType) => (
         <JobCard
@@ -29,6 +27,5 @@ export default function Favorites({
         />
       ))}
     </div>
-  );
-
+  )
 }

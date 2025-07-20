@@ -1,29 +1,28 @@
-import clsx from 'clsx';
+import clsx from 'clsx'
 import type { NYCJobType } from '../types'
 import { cleanText } from '../utils.ts'
-import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid';
-
+import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid'
 
 interface JobCardProps {
-  job: NYCJobType;
-  onFavorite: (job: NYCJobType) => void;
-  onApplied: (job: NYCJobType) => void;
-  isFavorited?: boolean;
-  isApplied?: boolean;
+  job: NYCJobType
+  onFavorite: (job: NYCJobType) => void
+  onApplied: (job: NYCJobType) => void
+  isFavorited?: boolean
+  isApplied?: boolean
 }
 
 /* ───────────── Helpers ───────────── */
 const isExamRequired = (classification: string) =>
-  classification.startsWith('Competitive');
+  classification.startsWith('Competitive')
 
 const formatSalary = (from: string, to: string, freq: string) => {
   const f = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 0,
-  });
-  return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`;
-};
+  })
+  return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
+}
 
 function JobCard({
   job,
@@ -31,17 +30,17 @@ function JobCard({
   onApplied,
   isFavorited = false,
   isApplied = false,
-}: JobCardProps){
+}: JobCardProps) {
   const employmentType =
-    job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time';
+    job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time'
 
-  const examRequired = isExamRequired(job.title_classification);
-  const postedDate = new Date(job.posting_date).toLocaleDateString();
+  const examRequired = isExamRequired(job.title_classification)
+  const postedDate = new Date(job.posting_date).toLocaleDateString()
 
   return (
     <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-170 overflow-scroll">
       <div className="relative">
-      {/* Heart Favorite Button */}
+        {/* Heart Favorite Button */}
         <button
           className="favorite-button absolute p-0! top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none"
           onClick={() => onFavorite(job)}
@@ -53,12 +52,13 @@ function JobCard({
             <SolidHeart className="h-6 w-6" />
           )}
         </button>
-    </div>
-
+      </div>
 
       {/* Header Row */}
       <header className="flex flex-col gap-1">
-        <h3 className="text-2xl font-semibold leading-tight text-amber-950">{job.business_title}</h3>
+        <h3 className="text-2xl font-semibold leading-tight text-amber-950">
+          {job.business_title}
+        </h3>
         <p className="text-sm text-gray-500">{job.agency}</p>
         <div className="flex flex-wrap gap-2 mt-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
@@ -72,13 +72,14 @@ function JobCard({
               'px-2 py-1 rounded-full',
               examRequired
                 ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-green-200 text-green-800',
+                : 'bg-green-200 text-green-800'
             )}
           >
             {examRequired ? 'Exam Required' : 'No Exam'}
           </span>
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-            {job.number_of_positions} Position{job.number_of_positions !== '1' && 's'}
+            {job.number_of_positions} Position
+            {job.number_of_positions !== '1' && 's'}
           </span>
         </div>
       </header>
@@ -87,7 +88,7 @@ function JobCard({
       <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm text-gray-700">
         <dt className="font-medium">Date Posted</dt>
         <dd>{postedDate}</dd>
-        
+
         <dt className="font-medium">Job ID</dt>
         <dd>{job.job_id}</dd>
 
@@ -110,7 +111,13 @@ function JobCard({
         <dd>{job.career_level}</dd>
 
         <dt className="font-medium">Salary Range</dt>
-        <dd>{formatSalary(job.salary_range_from, job.salary_range_to, job.salary_frequency)}</dd>
+        <dd>
+          {formatSalary(
+            job.salary_range_from,
+            job.salary_range_to,
+            job.salary_frequency
+          )}
+        </dd>
 
         <dt className="font-medium">Salary Frequency</dt>
         <dd>{job.salary_frequency}</dd>
@@ -139,19 +146,25 @@ function JobCard({
 
       {/* Job Description & Requirements */}
       <section className="space-y-3 text-sm text-gray-800">
-      <div>
-        <h5 className="font-medium mb-1">Residency Requirement</h5>
-        <p className="whitespace-pre-line">{cleanText(job.residency_requirement)}</p>
-      </div>
-        
+        <div>
+          <h5 className="font-medium mb-1">Residency Requirement</h5>
+          <p className="whitespace-pre-line">
+            {cleanText(job.residency_requirement)}
+          </p>
+        </div>
+
         <div>
           <h5 className="font-medium mb-1">Job Description</h5>
-          <p className="whitespace-pre-line">{cleanText(job.job_description)}</p>
+          <p className="whitespace-pre-line">
+            {cleanText(job.job_description)}
+          </p>
         </div>
         {job.minimum_qual_requirements && (
           <div>
             <h5 className="font-medium mb-1">Minimum Qualifications</h5>
-            <p className="whitespace-pre-line">{cleanText(job.minimum_qual_requirements)}</p>
+            <p className="whitespace-pre-line">
+              {cleanText(job.minimum_qual_requirements)}
+            </p>
           </div>
         )}
         {job.to_apply && (
@@ -164,8 +177,6 @@ function JobCard({
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-4">
-
-
         <button
           onClick={() => onApplied(job)}
           disabled={isApplied}
@@ -173,14 +184,14 @@ function JobCard({
             'text-sm font-medium rounded-lg px-4 py-2',
             isApplied
               ? 'bg-green-100 text-green-600 cursor-default'
-              : 'bg-green-600 text-white hover:bg-green-700',
+              : 'bg-green-600 text-white hover:bg-green-700'
           )}
         >
           {isApplied ? 'Applied' : 'Apply'}
         </button>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default JobCard;
+export default JobCard

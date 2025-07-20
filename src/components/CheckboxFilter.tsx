@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 interface Option {
-  value: string;
-  label: string;
-  count?: number;
+  value: string
+  label: string
+  count?: number
 }
 
 interface CheckboxFilterProps {
-  id: string;
-  label: string;
-  options: Option[];
-  selected: string[];
-  onChange: (values: string[]) => void;
+  id: string
+  label: string
+  options: Option[]
+  selected: string[]
+  onChange: (values: string[]) => void
 }
 
 function CheckboxFilter({
@@ -21,14 +21,14 @@ function CheckboxFilter({
   selected,
   onChange,
 }: CheckboxFilterProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const toggleOption = (value: string) => {
     const next = selected.includes(value)
       ? selected.filter((v) => v !== value)
-      : [...selected, value];
-    onChange(next);
-  };
+      : [...selected, value]
+    onChange(next)
+  }
 
   return (
     <div className="relative w-full">
@@ -52,13 +52,18 @@ function CheckboxFilter({
       <div
         id={`${id}-dropdown`}
         className={`absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden transition-all duration-200 ${
-          isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+          isOpen
+            ? 'max-h-60 opacity-100'
+            : 'max-h-0 opacity-0 pointer-events-none'
         }`}
         style={{ transitionProperty: 'max-height, opacity' }}
       >
         <div className="px-4 py-2 max-h-60 overflow-y-auto">
           {options.map((option) => (
-            <label key={option.value} className="flex items-center gap-2 text-sm text-gray-700 py-1">
+            <label
+              key={option.value}
+              className="flex items-center gap-2 text-sm text-gray-700 py-1"
+            >
               <input
                 type="checkbox"
                 value={option.value}
@@ -72,7 +77,7 @@ function CheckboxFilter({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default CheckboxFilter;
+export default CheckboxFilter
