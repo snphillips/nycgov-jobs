@@ -16,7 +16,7 @@ const NON_EXAM_CLASSES = [
 export function App() {
   const { jobs, loading, error } = useNYCJobs(); 
   const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(new Set());
-  const [applied, setApplied]     = useState<Set<string>>(new Set());
+  const [applied, setApplied] = useState<Set<string>>(new Set());
 
   /* ─────────── Filters ─────────── */
   const [selectedEmploymentKind, setSelectedEmploymentKind] = useState<string[]>([]);
@@ -44,28 +44,37 @@ export function App() {
 
   // De-duplicate rows by job_id 
   // I don't know why, but the data contains jobs with duplicate job_id
-  const uniqueJobs = useMemo(() => {
-    const map = new Map<string, NYCJobType>();
-    let duplicateCount = 0;
+const uniqueJobs = useMemo(() => {
+  const map = new Map<string, NYCJobType>();
+  let duplicateCount = 0;
 
-    jobs.forEach((job) => {
-      const existing = map.get(job.job_id);
+  jobs.forEach((job) => {
+    const existing = map.get(job.job_id);
 
-      if (!existing) {
+    if (!existing) {
+      map.set(job.job_id, job);
+      return;
+    }
+
+    const currentIsExternal = job.posting_type === 'External';
+    const existingIsExternal = existing.posting_type === 'External';
+
+    if (currentIsExternal && !existingIsExternal) {
+      map.set(job.job_id, job);
+    } else if (currentIsExternal === existingIsExternal) {
+      const isNewer = new Date(job.posting_updated) > new Date(existing.posting_updated);
+      if (isNewer) {
         map.set(job.job_id, job);
-      } else {
-        // Check if this job is more recent than the existing one
-        const isNewer = new Date(job.posting_updated) > new Date(existing.posting_updated);
-        if (isNewer) {
-          map.set(job.job_id, job);
-        }
-        duplicateCount++;
       }
-    });
+    }
+
+    duplicateCount++;
+  });
 
   console.log(`🧹 Removed ${duplicateCount} duplicate job postings.`);
   return Array.from(map.values());
 }, [jobs]);
+
 
 
 
@@ -228,7 +237,7 @@ const titleClassificationOptions = useMemo(() => {
   return (
     <>
     <h1 className='block p-6'>nyc gov job search</h1>
-    <div role="doc-subtitle" className='pl-6 pb-6 font-semibold'>Search for nyc.gov jobs</div>
+    <div role="doc-subtitle" className='pl-6 pb-6 font-semibold'>Filter nyc.gov jobs. Jobs renew weekly. This site prioritizes jobs for non-employees.</div>
     <FilterBar
       selectedEmploymentKind={selectedEmploymentKind}
       setSelectedEmploymentKind={setSelectedEmploymentKind}
@@ -252,19 +261,22 @@ const titleClassificationOptions = useMemo(() => {
       />
 
     <h2 className="text-lg font-semibold mb-4 text-center text-gray-300 p-3">{filteredJobs.length} jobs match your criteria</h2>
-<main className="columns-1 sm:columns-2 xl:columns-4 gap-6 p-6 bg-gray-50">
-  {filteredJobs.map((job) => (
-    <div key={`${job.job_id}-${job.posting_updated}`} className="mb-6 break-inside-avoid">
-      <JobCard
-        job={job}
-        onFavorite={toggleFavorite}
-        onApplied={markApplied}
-        isFavorited={favoriteJobs.has(job.job_id)}
-        isApplied={applied.has(job.job_id)}
-      />
-    </div>
-  ))}
-</main>
+    
+<main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3
+xl:grid-cols-4 bg-gray-50 min-h-screen">
+      {filteredJobs.map((job) => (
+        <JobCard
+          key={`${job.job_id}-${job.posting_updated}`}
+          job={job}
+          onFavorite={toggleFavorite}
+          onApplied={markApplied}
+          isFavorited={favoriteJobs.has(job.job_id)}
+          isApplied={applied.has(job.job_id)}
+        />
+      ))}
+    </main>
+
+
     </>
   );
 };

@@ -5,12 +5,14 @@ interface FavoritesProps {
   toggleFavorite: () => void;
   markApplied: () => void;
   favoriteJobs: any;
+  applied: any;
 }
 
 export default function Favorites({
   toggleFavorite,
   markApplied,
-  favoriteJobs
+  favoriteJobs,
+  applied
 }:FavoritesProps ) {
 
   return(

@@ -39,7 +39,7 @@ function JobCard({
   const postedDate = new Date(job.posting_date).toLocaleDateString();
 
   return (
-    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-fit">
+    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-170 overflow-scroll">
       <div className="relative">
       {/* Heart Favorite Button */}
         <button
