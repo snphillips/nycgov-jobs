@@ -14,10 +14,7 @@ export function JobCards({
   toggleFavorite,
 }: JobCardsProps) {
   return (
-    <main
-      className="grid gap-8 p-6 sm:grid-cols-2 md:grid-cols-3
-    xl:grid-cols-4 bg-stone-400 min-h-screen"
-    >
+    <>
       {filteredJobs.map((job: NYCJobType) => (
         <JobCard
           key={`${job.job_id}-${job.posting_updated}`}
@@ -26,6 +23,6 @@ export function JobCards({
           isFavorited={favoriteJobs.has(job.job_id)}
         />
       ))}
-    </main>
+    </>
   )
 }

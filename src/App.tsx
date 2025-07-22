@@ -43,7 +43,7 @@ export default function App() {
         {filteredJobs.length} jobs match your criteria
       </h2>
 
-      <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 bg-gray-50 min-h-screen">
+      <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-h-screen bg-stone-300">
         {filteredJobs.map((job) => (
           <JobCard
             key={`${job.job_id}-${job.posting_updated}`}

@@ -30,27 +30,28 @@ function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
   const postedDate = new Date(job.posting_date).toLocaleDateString()
 
   return (
-    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-136 overflow-scroll">
-      <div className="relative">
-        {/* Heart Favorite Button */}
-        <button
-          className="favorite-button absolute p-0! top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none"
-          onClick={() => onFavorite(job)}
-          aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
-        >
-          {isFavorited ? (
-            <SolidHeart className="h-6 w-6 text-red-600" />
-          ) : (
-            <SolidHeart className="h-6 w-6" />
-          )}
-        </button>
-      </div>
-
+    <section className="w-full bg-stone-100 shadow-md rounded-lg p-4 flex flex-col gap-6 border-b h-100 overflow-scroll">
       {/* Header Row */}
       <header className="flex flex-col gap-1">
-        <h3 className="text-2xl font-semibold leading-tight text-amber-950">
-          {job.business_title}
-        </h3>
+        <div className="flex flex-row justify-between">
+          <h3 className="text-2l font-semibold leading-tight text-amber-950">
+            {job.business_title}
+          </h3>
+          {/* Heart Favorite Button */}
+          {/* <div className="relative"> */}
+          <button
+            className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! border-radius-25!"
+            onClick={() => onFavorite(job)}
+            aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
+          >
+            {isFavorited ? (
+              <SolidHeart className="h-6 w-6 text-red-600" />
+            ) : (
+              <SolidHeart className="h-6 w-6" />
+            )}
+          </button>
+        </div>
+        {/* </div> */}
         <p className="text-sm text-gray-500">{job.agency}</p>
         <div className="flex flex-wrap gap-2 mt-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
@@ -80,7 +81,6 @@ function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
       <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm text-gray-700">
         <dt className="font-medium">Date Posted</dt>
         <dd>{postedDate}</dd>
-
         <dt className="font-medium">Salary Range</dt>
         <dd>
           {formatSalary(
@@ -89,31 +89,22 @@ function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
             job.salary_frequency
           )}
         </dd>
-
         <dt className="font-medium">Posting Type</dt>
         <dd>{job.posting_type}</dd>
-
-        <dt className="font-medium">Civil Service Title</dt>
-        <dd>{job.civil_service_title}</dd>
-
-        <dt className="font-medium">Title Classification</dt>
-        <dd>{job.title_classification}</dd>
-
-        <dt className="font-medium">Title Code</dt>
-        <dd>{job.title_code_no}</dd>
-
-        <dt className="font-medium">Level</dt>
-        <dd>{job.level}</dd>
-
-        <dt className="font-medium">Career Level</dt>
-        <dd>{job.career_level}</dd>
-
-        <dt className="font-medium">Salary Frequency</dt>
-        <dd>{job.salary_frequency}</dd>
-
         <dt className="font-medium">Work Location</dt>
         <dd>{job.work_location}</dd>
-
+        <dt className="font-medium">Career Level</dt>
+        <dd>{job.career_level}</dd>
+        <dt className="font-medium">Civil Service Title</dt>
+        <dd>{job.civil_service_title}</dd>
+        <dt className="font-medium">Title Classification</dt>
+        <dd>{job.title_classification}</dd>
+        <dt className="font-medium">Title Code</dt>
+        <dd>{job.title_code_no}</dd>
+        <dt className="font-medium">Level</dt>
+        <dd>{job.level}</dd>
+        <dt className="font-medium">Salary Frequency</dt>
+        <dd>{job.salary_frequency}</dd>
         <dt className="font-medium">Division / Unit</dt>
         <dd>{job.division_work_unit}</dd>
         <>
