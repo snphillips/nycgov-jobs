@@ -3,16 +3,12 @@ import type { NYCJobType } from '../types'
 
 interface FavoritesProps {
   toggleFavorite: () => void
-  markApplied: () => void
   favoriteJobs: any
-  applied: any
 }
 
 export default function Favorites({
   toggleFavorite,
-  markApplied,
   favoriteJobs,
-  applied,
 }: FavoritesProps) {
   return (
     <div>
@@ -21,9 +17,7 @@ export default function Favorites({
           key={`${job.job_id}-${job.posting_updated}`}
           job={job}
           onFavorite={toggleFavorite}
-          onApplied={markApplied}
           isFavorited={favoriteJobs.has(job.job_id)}
-          isApplied={applied.has(job.job_id)}
         />
       ))}
     </div>

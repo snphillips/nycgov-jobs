@@ -40,7 +40,7 @@ export function FilterBar({
   postingTypeOptions,
 }: FilterBarProps) {
   return (
-    <section className="bg-gray-200 p-4 md:p-4 shadow-sm mb-6">
+    <section className="bg-stone-300 p-4 md:p-4 shadow-sm mb-6">
       <h2 className="text-lg font-semibold mb-4 text-gray-800">Filter Jobs</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
         <CheckboxFilter

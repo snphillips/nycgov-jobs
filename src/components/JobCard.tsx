@@ -6,9 +6,7 @@ import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid'
 interface JobCardProps {
   job: NYCJobType
   onFavorite: (job: NYCJobType) => void
-  onApplied: (job: NYCJobType) => void
   isFavorited?: boolean
-  isApplied?: boolean
 }
 
 /* ───────────── Helpers ───────────── */
@@ -24,13 +22,7 @@ const formatSalary = (from: string, to: string, freq: string) => {
   return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
 }
 
-function JobCard({
-  job,
-  onFavorite,
-  onApplied,
-  isFavorited = false,
-  isApplied = false,
-}: JobCardProps) {
+function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
   const employmentType =
     job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time'
 
@@ -38,7 +30,7 @@ function JobCard({
   const postedDate = new Date(job.posting_date).toLocaleDateString()
 
   return (
-    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-170 overflow-scroll">
+    <section className="w-full bg-white shadow-md rounded-none p-6 flex flex-col gap-6 border-b h-136 overflow-scroll">
       <div className="relative">
         {/* Heart Favorite Button */}
         <button
@@ -89,8 +81,14 @@ function JobCard({
         <dt className="font-medium">Date Posted</dt>
         <dd>{postedDate}</dd>
 
-        <dt className="font-medium">Job ID</dt>
-        <dd>{job.job_id}</dd>
+        <dt className="font-medium">Salary Range</dt>
+        <dd>
+          {formatSalary(
+            job.salary_range_from,
+            job.salary_range_to,
+            job.salary_frequency
+          )}
+        </dd>
 
         <dt className="font-medium">Posting Type</dt>
         <dd>{job.posting_type}</dd>
@@ -109,15 +107,6 @@ function JobCard({
 
         <dt className="font-medium">Career Level</dt>
         <dd>{job.career_level}</dd>
-
-        <dt className="font-medium">Salary Range</dt>
-        <dd>
-          {formatSalary(
-            job.salary_range_from,
-            job.salary_range_to,
-            job.salary_frequency
-          )}
-        </dd>
 
         <dt className="font-medium">Salary Frequency</dt>
         <dd>{job.salary_frequency}</dd>
@@ -174,22 +163,6 @@ function JobCard({
           </div>
         )}
       </section>
-
-      {/* Actions */}
-      <div className="flex flex-wrap gap-3 pt-4">
-        <button
-          onClick={() => onApplied(job)}
-          disabled={isApplied}
-          className={clsx(
-            'text-sm font-medium rounded-lg px-4 py-2',
-            isApplied
-              ? 'bg-green-100 text-green-600 cursor-default'
-              : 'bg-green-600 text-white hover:bg-green-700'
-          )}
-        >
-          {isApplied ? 'Applied' : 'Apply'}
-        </button>
-      </div>
     </section>
   )
 }
