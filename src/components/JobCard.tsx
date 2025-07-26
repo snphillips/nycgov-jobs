@@ -40,7 +40,7 @@ function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
           {/* Heart Favorite Button */}
           {/* <div className="relative"> */}
           <button
-            className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! border-radius-25!"
+            className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
             onClick={() => onFavorite(job)}
             aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
           >

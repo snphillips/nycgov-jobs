@@ -20,6 +20,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
   const [selectedTitleClassification, setSelectedTitleClassification] =
     useState<string[]>([])
   const [selectedPostingType, setSelectedPostingType] = useState<string[]>([])
+  const [selectedCivilServiceTitle, setSelectedCivilServiceTitle] = useState<
+    string[]
+  >([])
 
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>()
@@ -153,6 +156,22 @@ export function useJobFilters(jobs: NYCJobType[]) {
     ]
   }, [uniqueJobs])
 
+  const civilServiceTitleOptions = useMemo(() => {
+    const counts: Record<string, number> = {}
+    uniqueJobs.forEach((job) => {
+      if (job.civil_service_title)
+        counts[job.civil_service_title] =
+          (counts[job.civil_service_title] || 0) + 1
+    })
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([civil_service_title, count]) => ({
+        value: civil_service_title,
+        label: toTitleCase(civil_service_title),
+        count,
+      }))
+  }, [uniqueJobs])
+
   return {
     filteredJobs,
     uniqueJobs,
@@ -167,6 +186,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedTitleClassification,
       selectedPostingType,
       setSelectedPostingType,
+      selectedCivilServiceTitle,
+      setSelectedCivilServiceTitle,
     },
     filterOptions: {
       employmentKindOptions,
@@ -174,6 +195,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       agencyFilterOptions,
       postingTypeOptions,
       titleClassificationOptions,
+      civilServiceTitleOptions,
     },
   }
 }

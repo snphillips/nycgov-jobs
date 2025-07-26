@@ -20,6 +20,10 @@ interface FilterBarProps {
   selectedPostingType: string[]
   setSelectedPostingType: React.Dispatch<React.SetStateAction<string[]>>
   postingTypeOptions: any[]
+
+  selectedCivilServiceTitle: string[]
+  setSelectedCivilServiceTitle: React.Dispatch<React.SetStateAction<string[]>>
+  civilServiceTitleOptions: any[]
 }
 
 export function FilterBar({
@@ -38,6 +42,9 @@ export function FilterBar({
   selectedPostingType,
   setSelectedPostingType,
   postingTypeOptions,
+  selectedCivilServiceTitle,
+  setSelectedCivilServiceTitle,
+  civilServiceTitleOptions,
 }: FilterBarProps) {
   return (
     <section className="bg-stone-300 p-4 md:p-4 shadow-sm mb-6">
@@ -78,6 +85,14 @@ export function FilterBar({
           options={postingTypeOptions}
           selected={selectedPostingType}
           onChange={setSelectedPostingType}
+        />
+
+        <CheckboxFilter
+          id="civil_service_title"
+          label="Civil Service Title"
+          options={civilServiceTitleOptions}
+          selected={selectedCivilServiceTitle}
+          onChange={setSelectedCivilServiceTitle}
         />
       </div>
     </section>
