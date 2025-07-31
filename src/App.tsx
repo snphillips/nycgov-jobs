@@ -9,7 +9,7 @@ export default function App() {
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
   const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(new Set())
-  const [applied, setApplied] = useState<Set<string>>(new Set())
+  // const [applied, setApplied] = useState<Set<string>>(new Set())
 
   const toggleFavorite = (job: NYCJobType) =>
     setFavoriteJobs((prev) => {
@@ -23,8 +23,8 @@ export default function App() {
       return next
     })
 
-  const markApplied = (job: NYCJobType) =>
-    setApplied((prev) => new Set(prev).add(job.job_id))
+  // const markApplied = (job: NYCJobType) =>
+  //   setApplied((prev) => new Set(prev).add(job.job_id))
 
   if (loading) return <p className="p-6">Loading NYC job listings…</p>
   if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
@@ -49,9 +49,9 @@ export default function App() {
             key={`${job.job_id}-${job.posting_updated}`}
             job={job}
             onFavorite={toggleFavorite}
-            onApplied={markApplied}
+            // onApplied={markApplied}
             isFavorited={favoriteJobs.has(job.job_id)}
-            isApplied={applied.has(job.job_id)}
+            // isApplied={applied.has(job.job_id)}
           />
         ))}
       </main>

@@ -23,6 +23,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
   const [selectedCivilServiceTitle, setSelectedCivilServiceTitle] = useState<
     string[]
   >([])
+  const [selectedLevel, setSelectedLevel] = useState<string[]>([])
 
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>()
@@ -66,6 +67,15 @@ export function useJobFilters(jobs: NYCJobType[]) {
         return false
 
       if (
+        selectedCivilServiceTitle.length > 0 &&
+        !selectedCivilServiceTitle.includes(job.civil_service_title)
+      )
+        return false
+
+      if (selectedLevel.length > 0 && !selectedLevel.includes(job.level))
+        return false
+
+      if (
         selectedPostingType.length > 0 &&
         !selectedPostingType.includes(job.posting_type)
       )
@@ -90,6 +100,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedAgencies,
     selectedPostingType,
     selectedTitleClassification,
+    selectedCivilServiceTitle,
+    selectedLevel,
   ])
 
   const employmentKindOptions = useMemo(() => {
@@ -172,6 +184,20 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
+  const levelOptions = useMemo(() => {
+    const counts: Record<string, number> = {}
+    uniqueJobs.forEach((job) => {
+      if (job.level) counts[job.level] = (counts[job.level] || 0) + 1
+    })
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([level, count]) => ({
+        value: level,
+        label: toTitleCase(level),
+        count,
+      }))
+  }, [uniqueJobs])
+
   return {
     filteredJobs,
     uniqueJobs,
@@ -188,6 +214,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedPostingType,
       selectedCivilServiceTitle,
       setSelectedCivilServiceTitle,
+      selectedLevel,
+      setSelectedLevel,
     },
     filterOptions: {
       employmentKindOptions,
@@ -196,6 +224,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       postingTypeOptions,
       titleClassificationOptions,
       civilServiceTitleOptions,
+      levelOptions,
     },
   }
 }

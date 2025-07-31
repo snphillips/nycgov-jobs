@@ -24,6 +24,10 @@ interface FilterBarProps {
   selectedCivilServiceTitle: string[]
   setSelectedCivilServiceTitle: React.Dispatch<React.SetStateAction<string[]>>
   civilServiceTitleOptions: any[]
+
+  selectedLevel: string[]
+  setSelectedLevel: React.Dispatch<React.SetStateAction<string[]>>
+  levelOptions: any[]
 }
 
 export function FilterBar({
@@ -45,6 +49,9 @@ export function FilterBar({
   selectedCivilServiceTitle,
   setSelectedCivilServiceTitle,
   civilServiceTitleOptions,
+  selectedLevel,
+  setSelectedLevel,
+  levelOptions,
 }: FilterBarProps) {
   return (
     <section className="bg-stone-300 p-4 md:p-4 shadow-sm mb-6">
@@ -93,6 +100,14 @@ export function FilterBar({
           options={civilServiceTitleOptions}
           selected={selectedCivilServiceTitle}
           onChange={setSelectedCivilServiceTitle}
+        />
+
+        <CheckboxFilter
+          id="level"
+          label="Level"
+          options={levelOptions}
+          selected={selectedLevel}
+          onChange={setSelectedLevel}
         />
       </div>
     </section>
