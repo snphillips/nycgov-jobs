@@ -1,33 +1,38 @@
 import CheckboxFilter from './CheckboxFilter'
+import type { Option } from './CheckboxFilter'
 
 interface FilterBarProps {
   selectedEmploymentKind: string[]
   setSelectedEmploymentKind: React.Dispatch<React.SetStateAction<string[]>>
-  employmentKindOptions: any[]
+  employmentKindOptions: Option[]
 
   selectedSalaryFrequency: string[]
   setSelectedSalaryFrequency: React.Dispatch<React.SetStateAction<string[]>>
-  salaryFrequencyOptions: any
+  salaryFrequencyOptions: Option[]
 
   selectedAgencies: string[]
   setSelectedAgencies: React.Dispatch<React.SetStateAction<string[]>>
-  agencyFilterOptions: any[]
+  agencyFilterOptions: Option[]
 
   selectedTitleClassification: string[]
   setSelectedTitleClassification: React.Dispatch<React.SetStateAction<string[]>>
-  titleClassificationOptions: any[]
+  examTitleClassificationOptions: Option[]
 
   selectedPostingType: string[]
   setSelectedPostingType: React.Dispatch<React.SetStateAction<string[]>>
-  postingTypeOptions: any[]
+  postingTypeOptions: Option[]
 
   selectedCivilServiceTitle: string[]
   setSelectedCivilServiceTitle: React.Dispatch<React.SetStateAction<string[]>>
-  civilServiceTitleOptions: any[]
+  civilServiceTitleOptions: Option[]
 
   selectedLevel: string[]
   setSelectedLevel: React.Dispatch<React.SetStateAction<string[]>>
-  levelOptions: any[]
+  levelOptions: Option[]
+
+  selectedPostingAge: string[]
+  setSelectedPostingAge: React.Dispatch<React.SetStateAction<string[]>>
+  postingAgeOptions: Option[]
 }
 
 export function FilterBar({
@@ -42,7 +47,7 @@ export function FilterBar({
   agencyFilterOptions,
   selectedTitleClassification,
   setSelectedTitleClassification,
-  titleClassificationOptions,
+  examTitleClassificationOptions,
   selectedPostingType,
   setSelectedPostingType,
   postingTypeOptions,
@@ -52,6 +57,9 @@ export function FilterBar({
   selectedLevel,
   setSelectedLevel,
   levelOptions,
+  postingAgeOptions,
+  selectedPostingAge,
+  setSelectedPostingAge,
 }: FilterBarProps) {
   return (
     <section className="bg-stone-300 p-4 md:p-4 shadow-sm mb-6">
@@ -60,7 +68,7 @@ export function FilterBar({
         <CheckboxFilter
           id="title_classification"
           label="Exam Required"
-          options={titleClassificationOptions}
+          options={examTitleClassificationOptions}
           selected={selectedTitleClassification}
           onChange={setSelectedTitleClassification}
         />
@@ -108,6 +116,14 @@ export function FilterBar({
           options={levelOptions}
           selected={selectedLevel}
           onChange={setSelectedLevel}
+        />
+
+        <CheckboxFilter
+          id="postingAge"
+          label="Date Posted"
+          options={postingAgeOptions}
+          selected={selectedPostingAge}
+          onChange={setSelectedPostingAge}
         />
       </div>
     </section>

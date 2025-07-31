@@ -2,11 +2,21 @@ import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
 import { toTitleCase } from '../utils'
 
-const NON_EXAM_CLASSES = [
+const NON_EXAM_TITLE_CLASSIFICATION = [
   'Pending Classification-2',
   'Labor-3',
   'Exempt-4',
   'Non-Competitive-5',
+]
+
+const DATE_BUCKETS = [
+  { value: '1w', label: 'Past week', days: 7 },
+  { value: '2w', label: 'Past 2 weeks', days: 14 },
+  { value: '3w', label: 'Past 3 weeks', days: 21 },
+  { value: '1m', label: 'Past month', days: 30 },
+  { value: '6m', label: 'Past 6 months', days: 183 },
+  { value: '1y', label: 'Past year', days: 365 },
+  { value: 'older', label: 'More than a year', days: Infinity }, // handled separately
 ]
 
 export function useJobFilters(jobs: NYCJobType[]) {
@@ -24,6 +34,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
     string[]
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
+  const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
+
+  const now = Date.now()
 
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>()
@@ -80,16 +93,29 @@ export function useJobFilters(jobs: NYCJobType[]) {
         !selectedPostingType.includes(job.posting_type)
       )
         return false
-
       if (
         selectedTitleClassification.length > 0 &&
         !(
           selectedTitleClassification.includes(job.title_classification) ||
           (selectedTitleClassification.includes('no-exam') &&
-            NON_EXAM_CLASSES.includes(job.title_classification))
+            NON_EXAM_TITLE_CLASSIFICATION.includes(job.title_classification))
         )
       )
         return false
+
+      if (selectedPostingAge.length > 0) {
+        const postingDate = new Date(job.posting_date)
+        const ageInDays = (now - postingDate.getTime()) / (1000 * 60 * 60 * 24)
+
+        const matches = selectedPostingAge.some((bucket) => {
+          const days = DATE_BUCKETS.find((b) => b.value === bucket)?.days
+          if (!days) return false
+          if (bucket === 'older') return ageInDays > 365
+          return ageInDays <= days
+        })
+
+        if (!matches) return false
+      }
 
       return true
     })
@@ -99,9 +125,10 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedSalaryFrequency,
     selectedAgencies,
     selectedPostingType,
-    selectedTitleClassification,
     selectedCivilServiceTitle,
     selectedLevel,
+    selectedPostingAge,
+    now,
   ])
 
   const employmentKindOptions = useMemo(() => {
@@ -154,12 +181,12 @@ export function useJobFilters(jobs: NYCJobType[]) {
     }))
   }, [uniqueJobs])
 
-  const titleClassificationOptions = useMemo(() => {
+  const examTitleClassificationOptions = useMemo(() => {
     let examCount = 0
     let noExamCount = 0
     uniqueJobs.forEach((job) => {
       if (job.title_classification === 'Competitive-1') examCount++
-      else if (NON_EXAM_CLASSES.includes(job.title_classification))
+      else if (NON_EXAM_TITLE_CLASSIFICATION.includes(job.title_classification))
         noExamCount++
     })
     return [
@@ -198,6 +225,37 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
+  const postingAgeOptions = useMemo(() => {
+    const counts: Record<string, number> = {
+      '1w': 0,
+      '2w': 0,
+      '3w': 0,
+      '1m': 0,
+      '6m': 0,
+      '1y': 0,
+      older: 0,
+    }
+
+    uniqueJobs.forEach((job) => {
+      const date = new Date(job.posting_date)
+      const ageInDays = (now - date.getTime()) / (1000 * 60 * 60 * 24)
+
+      if (ageInDays <= 7) counts['1w']++
+      if (ageInDays <= 14) counts['2w']++
+      if (ageInDays <= 21) counts['3w']++
+      if (ageInDays <= 30) counts['1m']++
+      if (ageInDays <= 183) counts['6m']++
+      if (ageInDays <= 365) counts['1y']++
+      if (ageInDays > 365) counts['older']++
+    })
+
+    return DATE_BUCKETS.map(({ value, label }) => ({
+      value,
+      label,
+      count: counts[value],
+    }))
+  }, [uniqueJobs, now])
+
   return {
     filteredJobs,
     uniqueJobs,
@@ -216,15 +274,18 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedCivilServiceTitle,
       selectedLevel,
       setSelectedLevel,
+      selectedPostingAge,
+      setSelectedPostingAge,
     },
     filterOptions: {
       employmentKindOptions,
       salaryFrequencyOptions,
       agencyFilterOptions,
       postingTypeOptions,
-      titleClassificationOptions,
+      examTitleClassificationOptions,
       civilServiceTitleOptions,
       levelOptions,
+      postingAgeOptions,
     },
   }
 }

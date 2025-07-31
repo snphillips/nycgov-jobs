@@ -49,8 +49,8 @@ export default function App() {
             key={`${job.job_id}-${job.posting_updated}`}
             job={job}
             onFavorite={toggleFavorite}
-            // onApplied={markApplied}
             isFavorited={favoriteJobs.has(job.job_id)}
+            // onApplied={markApplied}
             // isApplied={applied.has(job.job_id)}
           />
         ))}
