@@ -26,7 +26,7 @@ export function useNYCJobs() {
           allJobs.push(...chunk)
         }
 
-        // Filter to only external jobs within the last 6 months
+        // Filter to keep only external jobs within the last 6 months
         const sixMonthsAgo = Date.now() - 1000 * 60 * 60 * 24 * 183
 
         const filtered = allJobs.filter((job) => {

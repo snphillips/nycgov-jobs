@@ -18,10 +18,6 @@ interface FilterBarProps {
   setSelectedTitleClassification: React.Dispatch<React.SetStateAction<string[]>>
   examTitleClassificationOptions: Option[]
 
-  selectedPostingType: string[]
-  setSelectedPostingType: React.Dispatch<React.SetStateAction<string[]>>
-  postingTypeOptions: Option[]
-
   selectedCivilServiceTitle: string[]
   setSelectedCivilServiceTitle: React.Dispatch<React.SetStateAction<string[]>>
   civilServiceTitleOptions: Option[]
@@ -48,9 +44,6 @@ export function FilterBar({
   selectedTitleClassification,
   setSelectedTitleClassification,
   examTitleClassificationOptions,
-  selectedPostingType,
-  setSelectedPostingType,
-  postingTypeOptions,
   selectedCivilServiceTitle,
   setSelectedCivilServiceTitle,
   civilServiceTitleOptions,
@@ -93,15 +86,6 @@ export function FilterBar({
           selected={selectedAgencies}
           onChange={setSelectedAgencies}
         />
-
-        <CheckboxFilter
-          id="posting_type"
-          label="Internal/External"
-          options={postingTypeOptions}
-          selected={selectedPostingType}
-          onChange={setSelectedPostingType}
-        />
-
         <CheckboxFilter
           id="civil_service_title"
           label="Civil Service Title"
@@ -109,7 +93,6 @@ export function FilterBar({
           selected={selectedCivilServiceTitle}
           onChange={setSelectedCivilServiceTitle}
         />
-
         <CheckboxFilter
           id="level"
           label="Level"
@@ -117,7 +100,6 @@ export function FilterBar({
           selected={selectedLevel}
           onChange={setSelectedLevel}
         />
-
         <CheckboxFilter
           id="postingAge"
           label="Date Posted"

@@ -58,21 +58,17 @@ export default function App() {
       Daily: 'daily rate',
       'Competitive-1': 'exam required',
       'no-exam': 'no exam',
-      Internal: 'internal applicants',
-      External: 'external applicants',
       '1w': '1 week',
       '2w': '2 weeks',
       '3w': '3 weeks',
       '1m': 'one month',
       '6m': 'six months',
-      // '1y': 'one year',
-      // older: 'more than a year',
     }
 
     selectedEmploymentKind.forEach((v) => labels.push(map[v] || v))
     selectedSalaryFrequency.forEach((v) => labels.push(map[v] || v))
     selectedTitleClassification.forEach((v) => labels.push(map[v] || v))
-    selectedPostingType.forEach((v) => labels.push(map[v] || v))
+    // selectedPostingType.forEach((v) => labels.push(map[v] || v))
     selectedPostingAge.forEach((v) => labels.push(map[v] || v))
     selectedAgencies.forEach((v) => labels.push(v.toLowerCase()))
     selectedCivilServiceTitle.forEach((v) => labels.push(v.toLowerCase()))
@@ -100,7 +96,7 @@ export default function App() {
           selectedSalaryFrequency: filterState.selectedSalaryFrequency,
           selectedAgencies: filterState.selectedAgencies,
           selectedTitleClassification: filterState.selectedTitleClassification,
-          selectedPostingType: filterState.selectedPostingType,
+          // selectedPostingType: filterState.selectedPostingType,
           selectedCivilServiceTitle: filterState.selectedCivilServiceTitle,
           selectedLevel: filterState.selectedLevel,
           selectedPostingAge: filterState.selectedPostingAge,
