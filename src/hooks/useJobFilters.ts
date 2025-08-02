@@ -15,8 +15,8 @@ const DATE_BUCKETS = [
   { value: '3w', label: 'Past 3 weeks', days: 21 },
   { value: '1m', label: 'Past month', days: 30 },
   { value: '6m', label: 'Past 6 months', days: 183 },
-  { value: '1y', label: 'Past year', days: 365 },
-  { value: 'older', label: 'More than a year', days: Infinity }, // handled separately
+  // { value: '1y', label: 'Past year', days: 365 },
+  // { value: 'older', label: 'More than a year', days: Infinity }, // handled separately
 ]
 
 export function useJobFilters(jobs: NYCJobType[]) {
@@ -128,6 +128,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedCivilServiceTitle,
     selectedLevel,
     selectedPostingAge,
+    selectedTitleClassification,
     now,
   ])
 
@@ -232,8 +233,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       '3w': 0,
       '1m': 0,
       '6m': 0,
-      '1y': 0,
-      older: 0,
+      // '1y': 0,
+      // older: 0,
     }
 
     uniqueJobs.forEach((job) => {
@@ -245,8 +246,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       if (ageInDays <= 21) counts['3w']++
       if (ageInDays <= 30) counts['1m']++
       if (ageInDays <= 183) counts['6m']++
-      if (ageInDays <= 365) counts['1y']++
-      if (ageInDays > 365) counts['older']++
+      // if (ageInDays <= 365) counts['1y']++
+      // if (ageInDays > 365) counts['older']++
     })
 
     return DATE_BUCKETS.map(({ value, label }) => ({

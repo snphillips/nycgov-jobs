@@ -29,26 +29,7 @@ export default function App() {
   if (loading) return <p className="p-6">Loading NYC job listings…</p>
   if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
 
-  const prettyLabels: Record<string, string> = {
-    F: 'full time',
-    P: 'part time',
-    Annual: 'annual salary',
-    Hourly: 'hourly wage',
-    Daily: 'daily rate',
-    'Competitive-1': 'exam required',
-    'no-exam': 'no-exam',
-    Internal: 'internal applicants',
-    External: 'external applicants',
-    '1w': 'one week',
-    '2w': 'two weeks',
-    '3w': 'three weeks',
-    '1m': 'one month',
-    '6m': 'six months',
-    '1y': 'one year',
-    older: 'more than a year',
-  }
-
-  function getSelectedFiltersSummary({
+  function getSelectedFiltersArray({
     selectedEmploymentKind,
     selectedSalaryFrequency,
     selectedAgencies,
@@ -66,68 +47,55 @@ export default function App() {
     selectedCivilServiceTitle: string[]
     selectedLevel: string[]
     selectedPostingAge: string[]
-  }) {
-    const prettyLabels: Record<string, string> = {
+  }): string[] {
+    const labels: string[] = []
+
+    const map = {
       F: 'full time',
       P: 'part time',
       Annual: 'annual salary',
       Hourly: 'hourly wage',
       Daily: 'daily rate',
       'Competitive-1': 'exam required',
-      'no-exam': 'no-exam',
+      'no-exam': 'no exam',
       Internal: 'internal applicants',
       External: 'external applicants',
-      '1w': 'one week',
-      '2w': 'two weeks',
-      '3w': 'three weeks',
+      '1w': '1 week',
+      '2w': '2 weeks',
+      '3w': '3 weeks',
       '1m': 'one month',
       '6m': 'six months',
-      '1y': 'one year',
-      older: 'more than a year',
+      // '1y': 'one year',
+      // older: 'more than a year',
     }
 
-    const format = (arr: string[]) =>
-      arr.map((val) => prettyLabels[val] || val).join(', ')
+    selectedEmploymentKind.forEach((v) => labels.push(map[v] || v))
+    selectedSalaryFrequency.forEach((v) => labels.push(map[v] || v))
+    selectedTitleClassification.forEach((v) => labels.push(map[v] || v))
+    selectedPostingType.forEach((v) => labels.push(map[v] || v))
+    selectedPostingAge.forEach((v) => labels.push(map[v] || v))
+    selectedAgencies.forEach((v) => labels.push(v.toLowerCase()))
+    selectedCivilServiceTitle.forEach((v) => labels.push(v.toLowerCase()))
+    selectedLevel.forEach((v) => labels.push(`level ${v.toLowerCase()}`))
 
-    const summary: string[] = []
-
-    if (selectedEmploymentKind.length)
-      summary.push(format(selectedEmploymentKind))
-
-    if (selectedSalaryFrequency.length)
-      summary.push(format(selectedSalaryFrequency))
-
-    if (selectedAgencies.length)
-      summary.push(`agencies: ${format(selectedAgencies)}`)
-
-    if (selectedTitleClassification.length)
-      summary.push(format(selectedTitleClassification))
-
-    if (selectedPostingType.length) summary.push(format(selectedPostingType))
-
-    if (selectedCivilServiceTitle.length)
-      summary.push(`title: ${format(selectedCivilServiceTitle)}`)
-
-    if (selectedLevel.length) summary.push(`level: ${format(selectedLevel)}`)
-
-    if (selectedPostingAge.length)
-      summary.push(`posted: ${format(selectedPostingAge)}`)
-
-    return summary.length > 0 ? summary.join(', ') : 'No filters applied'
+    return labels
   }
 
   return (
     <>
       <h1 className="p-6">nyc gov job search</h1>
       <div className="pl-6 pb-6 font-semibold">
-        Filter NYC.gov jobs. Jobs renew weekly. This site prioritizes jobs for
-        current non-employees.
+        Filter recent NYC.gov jobs for current non-employees. Jobs renew weekly.
       </div>
 
       <FilterBar {...filterState} {...filterOptions} />
 
-      <p className="text-center text-sm">
-        {getSelectedFiltersSummary({
+      <div className="flex flex-wrap  items-center gap-2 p-3 text-sm text-stone-300">
+        <h2 className="font-semibold">
+          {filteredJobs.length} jobs match your criteria
+        </h2>
+
+        {getSelectedFiltersArray({
           selectedEmploymentKind: filterState.selectedEmploymentKind,
           selectedSalaryFrequency: filterState.selectedSalaryFrequency,
           selectedAgencies: filterState.selectedAgencies,
@@ -136,11 +104,15 @@ export default function App() {
           selectedCivilServiceTitle: filterState.selectedCivilServiceTitle,
           selectedLevel: filterState.selectedLevel,
           selectedPostingAge: filterState.selectedPostingAge,
-        })}
-      </p>
-      <h2 className="text-lg font-semibold text-center text-gray-300 p-3">
-        {filteredJobs.length} jobs match your criteria
-      </h2>
+        }).map((label, idx) => (
+          <span
+            key={idx}
+            className="px-3 py-1 rounded-full bg-stone-200 text-gray-800 text-xs"
+          >
+            {label}
+          </span>
+        ))}
+      </div>
 
       <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-h-screen bg-stone-300">
         {filteredJobs.map((job) => (

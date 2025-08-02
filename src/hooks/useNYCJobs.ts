@@ -6,7 +6,6 @@ export function useNYCJobs() {
   const [jobs, setJobs] = useState<NYCJobType[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(true)
-  // while in dev we're only grabbing a smaller number of jobs
   const RETRIEVAL_LIMIT = 1000
 
   useEffect(() => {
@@ -17,7 +16,6 @@ export function useNYCJobs() {
         const firstPage = await fetchJobs(0, RETRIEVAL_LIMIT)
         if (abort) return
 
-        // If there are more than 1000, pull additional pages
         const total = firstPage.length
         const pages = Math.ceil(total / RETRIEVAL_LIMIT)
         const allJobs = [...firstPage]
@@ -28,7 +26,17 @@ export function useNYCJobs() {
           allJobs.push(...chunk)
         }
 
-        setJobs(allJobs)
+        // Filter to only external jobs within the last 6 months
+        const sixMonthsAgo = Date.now() - 1000 * 60 * 60 * 24 * 183
+
+        const filtered = allJobs.filter((job) => {
+          return (
+            job.posting_type === 'External' &&
+            new Date(job.posting_date).getTime() >= sixMonthsAgo
+          )
+        })
+
+        setJobs(filtered)
       } catch (error) {
         if (!abort) setError(error as Error)
       } finally {
