@@ -35,8 +35,38 @@ export function useJobFilters(jobs: NYCJobType[]) {
 
   const now = Date.now()
 
+  // Deduplicate rows that share the same job_id
+  const uniqueJobs = useMemo(() => {
+    const map = new Map<string, NYCJobType>()
+
+    jobs.forEach((j) => {
+      const existing = map.get(j.job_id)
+
+      if (!existing) {
+        map.set(j.job_id, j)
+      } else {
+        const jIsExternal = j.posting_type === 'External'
+        const existingIsExternal = existing.posting_type === 'External'
+
+        // Prefer external postings
+        if (jIsExternal && !existingIsExternal) {
+          map.set(j.job_id, j)
+        } else if (jIsExternal === existingIsExternal) {
+          // If both are same type, keep the most recently updated
+          const existingDate = new Date(existing.posting_updated)
+          const newDate = new Date(j.posting_updated)
+          if (newDate > existingDate) {
+            map.set(j.job_id, j)
+          }
+        }
+      }
+    })
+
+    return Array.from(map.values())
+  }, [jobs])
+
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    return uniqueJobs.filter((job) => {
       if (
         selectedEmploymentKind.length > 0 &&
         !selectedEmploymentKind.includes(job.full_time_part_time_indicator)
@@ -96,12 +126,12 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedPostingAge,
     selectedTitleClassification,
     now,
-    jobs,
+    uniqueJobs,
   ])
 
   const employmentKindOptions = useMemo(() => {
     const map: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       map[job.full_time_part_time_indicator] =
         (map[job.full_time_part_time_indicator] || 0) + 1
     })
@@ -109,11 +139,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
       { value: 'F', label: 'Full-Time', count: map['F'] || 0 },
       { value: 'P', label: 'Part-Time', count: map['P'] || 0 },
     ]
-  }, [jobs])
+  }, [uniqueJobs])
 
   const agencyFilterOptions = useMemo(() => {
     const counts: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       if (job.agency) counts[job.agency] = (counts[job.agency] || 0) + 1
     })
     return Object.entries(counts)
@@ -123,11 +153,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
         label: toTitleCase(agency),
         count,
       }))
-  }, [jobs])
+  }, [uniqueJobs])
 
   const salaryFrequencyOptions = useMemo(() => {
     const map: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       map[job.salary_frequency] = (map[job.salary_frequency] || 0) + 1
     })
     return ['Annual', 'Hourly', 'Daily'].map((freq) => ({
@@ -135,11 +165,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
       label: freq,
       count: map[freq] || 0,
     }))
-  }, [jobs])
+  }, [uniqueJobs])
 
   const postingTypeOptions = useMemo(() => {
     const map: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       map[job.posting_type] = (map[job.posting_type] || 0) + 1
     })
     return ['Internal', 'External'].map((pt) => ({
@@ -147,12 +177,12 @@ export function useJobFilters(jobs: NYCJobType[]) {
       label: pt,
       count: map[pt] || 0,
     }))
-  }, [jobs])
+  }, [uniqueJobs])
 
   const examTitleClassificationOptions = useMemo(() => {
     let examCount = 0
     let noExamCount = 0
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       if (job.title_classification === 'Competitive-1') examCount++
       else if (NON_EXAM_TITLE_CLASSIFICATION.includes(job.title_classification))
         noExamCount++
@@ -161,11 +191,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
       { value: 'Competitive-1', label: 'Yes', count: examCount },
       { value: 'no-exam', label: 'No', count: noExamCount },
     ]
-  }, [jobs])
+  }, [uniqueJobs])
 
   const civilServiceTitleOptions = useMemo(() => {
     const counts: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       if (job.civil_service_title)
         counts[job.civil_service_title] =
           (counts[job.civil_service_title] || 0) + 1
@@ -177,11 +207,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
         label: toTitleCase(civil_service_title),
         count,
       }))
-  }, [jobs])
+  }, [uniqueJobs])
 
   const levelOptions = useMemo(() => {
     const counts: Record<string, number> = {}
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       if (job.level) counts[job.level] = (counts[job.level] || 0) + 1
     })
     return Object.entries(counts)
@@ -191,7 +221,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
         label: toTitleCase(level),
         count,
       }))
-  }, [jobs])
+  }, [uniqueJobs])
 
   const postingAgeOptions = useMemo(() => {
     const counts: Record<string, number> = {
@@ -202,7 +232,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       '6m': 0,
     }
 
-    jobs.forEach((job) => {
+    uniqueJobs.forEach((job) => {
       const date = new Date(job.posting_date)
       const ageInDays = (now - date.getTime()) / (1000 * 60 * 60 * 24)
 
@@ -218,7 +248,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       label,
       count: counts[value],
     }))
-  }, [jobs, now])
+  }, [uniqueJobs, now])
 
   return {
     filteredJobs,
