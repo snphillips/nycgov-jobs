@@ -4,9 +4,7 @@ import { fetchJobs } from '../api/fetchJobs'
 import { getJobsFromDB, getCacheTimestamp, saveJobsToDB } from '../db'
 
 const RETRIEVAL_LIMIT = 6000
-// const CACHE_KEY = 'nycJobsCache'
-// const CACHE_TIMESTAMP_KEY = 'nycJobsCacheTimestamp'
-const MAX_AGE_DAYS = 4
+const MAX_AGE_DAYS = 7
 const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000
 const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 183
 
@@ -48,7 +46,7 @@ export function useNYCJobs() {
           allJobs.push(...chunk)
         }
 
-        // ✅ Filter: External + last 6 months
+        // ✅ Filter: show only external jobs + jobs from the last 6 months
         const sixMonthsAgo = Date.now() - SIX_MONTHS_MS
         const filtered = allJobs.filter((job) => {
           return (

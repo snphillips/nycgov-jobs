@@ -1,4 +1,3 @@
-// src/db.ts
 import { openDB } from 'idb'
 import type { NYCJobType } from './types'
 
