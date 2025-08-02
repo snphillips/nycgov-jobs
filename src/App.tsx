@@ -48,7 +48,7 @@ export default function App() {
   }): string[] {
     const labels: string[] = []
 
-    const map = {
+    const filterOptionMap: Record<string, string> = {
       F: 'full time',
       P: 'part time',
       Annual: 'annual salary',
@@ -63,10 +63,12 @@ export default function App() {
       '6m': 'six months',
     }
 
-    selectedEmploymentKind.forEach((v) => labels.push(map[v] || v))
-    selectedSalaryFrequency.forEach((v) => labels.push(map[v] || v))
-    selectedTitleClassification.forEach((v) => labels.push(map[v] || v))
-    selectedPostingAge.forEach((v) => labels.push(map[v] || v))
+    selectedEmploymentKind.forEach((v) => labels.push(filterOptionMap[v] || v))
+    selectedSalaryFrequency.forEach((v) => labels.push(filterOptionMap[v] || v))
+    selectedTitleClassification.forEach((v) =>
+      labels.push(filterOptionMap[v] || v)
+    )
+    selectedPostingAge.forEach((v) => labels.push(filterOptionMap[v] || v))
     selectedAgencies.forEach((v) => labels.push(v.toLowerCase()))
     selectedCivilServiceTitle.forEach((v) => labels.push(v.toLowerCase()))
     selectedLevel.forEach((v) => labels.push(`level ${v.toLowerCase()}`))
