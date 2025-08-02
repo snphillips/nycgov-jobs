@@ -34,7 +34,6 @@ export default function App() {
     selectedSalaryFrequency,
     selectedAgencies,
     selectedTitleClassification,
-    selectedPostingType,
     selectedCivilServiceTitle,
     selectedLevel,
     selectedPostingAge,
@@ -43,7 +42,6 @@ export default function App() {
     selectedSalaryFrequency: string[]
     selectedAgencies: string[]
     selectedTitleClassification: string[]
-    selectedPostingType: string[]
     selectedCivilServiceTitle: string[]
     selectedLevel: string[]
     selectedPostingAge: string[]
@@ -68,7 +66,6 @@ export default function App() {
     selectedEmploymentKind.forEach((v) => labels.push(map[v] || v))
     selectedSalaryFrequency.forEach((v) => labels.push(map[v] || v))
     selectedTitleClassification.forEach((v) => labels.push(map[v] || v))
-    // selectedPostingType.forEach((v) => labels.push(map[v] || v))
     selectedPostingAge.forEach((v) => labels.push(map[v] || v))
     selectedAgencies.forEach((v) => labels.push(v.toLowerCase()))
     selectedCivilServiceTitle.forEach((v) => labels.push(v.toLowerCase()))
@@ -96,7 +93,6 @@ export default function App() {
           selectedSalaryFrequency: filterState.selectedSalaryFrequency,
           selectedAgencies: filterState.selectedAgencies,
           selectedTitleClassification: filterState.selectedTitleClassification,
-          // selectedPostingType: filterState.selectedPostingType,
           selectedCivilServiceTitle: filterState.selectedCivilServiceTitle,
           selectedLevel: filterState.selectedLevel,
           selectedPostingAge: filterState.selectedPostingAge,
