@@ -1,18 +1,40 @@
 import { useEffect, useState } from 'react'
 import type { NYCJobType } from '../types'
 import { fetchJobs } from '../api/fetchJobs'
+import { getJobsFromDB, getCacheTimestamp, saveJobsToDB } from '../db'
+
+const RETRIEVAL_LIMIT = 6000
+// const CACHE_KEY = 'nycJobsCache'
+// const CACHE_TIMESTAMP_KEY = 'nycJobsCacheTimestamp'
+const MAX_AGE_DAYS = 4
+const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000
+const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 183
 
 export function useNYCJobs() {
   const [jobs, setJobs] = useState<NYCJobType[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(true)
-  const RETRIEVAL_LIMIT = 1000
 
   useEffect(() => {
     let abort = false
 
-    ;(async () => {
+    const loadJobs = async () => {
       try {
+        const timestamp = await getCacheTimestamp()
+        const now = Date.now()
+
+        if (timestamp && now - timestamp < MAX_AGE_MS) {
+          const cached = await getJobsFromDB()
+          console.log('Data is young. Get cached data from DB')
+          if (!abort && cached) {
+            setJobs(cached)
+            setLoading(false)
+            return
+          }
+        }
+
+        // 🟡 Otherwise, fetch from API
+        console.log('Data is old. Fetching fresh data.')
         const firstPage = await fetchJobs(0, RETRIEVAL_LIMIT)
         if (abort) return
 
@@ -26,9 +48,8 @@ export function useNYCJobs() {
           allJobs.push(...chunk)
         }
 
-        // Filter to keep only external jobs within the last 6 months
-        const sixMonthsAgo = Date.now() - 1000 * 60 * 60 * 24 * 183
-
+        // ✅ Filter: External + last 6 months
+        const sixMonthsAgo = Date.now() - SIX_MONTHS_MS
         const filtered = allJobs.filter((job) => {
           return (
             job.posting_type === 'External' &&
@@ -36,13 +57,19 @@ export function useNYCJobs() {
           )
         })
 
-        setJobs(filtered)
+        if (!abort) {
+          setJobs(filtered)
+          setLoading(false)
+          await saveJobsToDB(filtered)
+        }
       } catch (error) {
         if (!abort) setError(error as Error)
       } finally {
         if (!abort) setLoading(false)
       }
-    })()
+    }
+
+    loadJobs()
 
     return () => {
       abort = true
