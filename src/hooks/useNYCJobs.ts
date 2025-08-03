@@ -3,8 +3,8 @@ import type { NYCJobType } from '../types'
 import { fetchJobs } from '../api/fetchJobs'
 import { getJobsFromDB, getCacheTimestamp, saveJobsToDB } from '../db'
 
-const RETRIEVAL_LIMIT = 6000
-const MAX_AGE_DAYS = 7
+const RETRIEVAL_LIMIT = 1000
+const MAX_AGE_DAYS = 0.00000000001
 const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000
 const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 183
 

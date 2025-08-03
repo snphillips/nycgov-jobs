@@ -24,6 +24,7 @@ function CheckboxFilter({
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleOption = (value: string) => {
+    console.log('toggleOption:', value)
     const next = selected.includes(value)
       ? selected.filter((v) => v !== value)
       : [...selected, value]
