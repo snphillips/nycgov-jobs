@@ -66,50 +66,62 @@ export function useJobFilters(jobs: NYCJobType[]) {
   }, [jobs])
 
   const filteredJobs = useMemo(() => {
+    const employmentKindSet = new Set(selectedEmploymentKind)
+    const salaryFrequencySet = new Set(selectedSalaryFrequency)
+    const agencySet = new Set(selectedAgencies)
+    const civilServiceTitleSet = new Set(selectedCivilServiceTitle)
+    const levelSet = new Set(selectedLevel)
+    const titleClassificationSet = new Set(selectedTitleClassification)
+    const postingAgeSet = new Set(selectedPostingAge)
+
+    const dateBucketMap = DATE_BUCKETS.reduce(
+      (acc, b) => {
+        acc[b.value] = b.days
+        return acc
+      },
+      {} as Record<string, number>
+    )
+
     return uniqueJobs.filter((job) => {
       if (
-        selectedEmploymentKind.length > 0 &&
-        !selectedEmploymentKind.includes(job.full_time_part_time_indicator)
+        employmentKindSet.size > 0 &&
+        !employmentKindSet.has(job.full_time_part_time_indicator)
       )
         return false
 
       if (
-        selectedSalaryFrequency.length > 0 &&
-        !selectedSalaryFrequency.includes(job.salary_frequency)
+        salaryFrequencySet.size > 0 &&
+        !salaryFrequencySet.has(job.salary_frequency)
       )
         return false
 
-      if (selectedAgencies.length > 0 && !selectedAgencies.includes(job.agency))
-        return false
+      if (agencySet.size > 0 && !agencySet.has(job.agency)) return false
 
       if (
-        selectedCivilServiceTitle.length > 0 &&
-        !selectedCivilServiceTitle.includes(job.civil_service_title)
+        civilServiceTitleSet.size > 0 &&
+        !civilServiceTitleSet.has(job.civil_service_title)
       )
         return false
 
-      if (selectedLevel.length > 0 && !selectedLevel.includes(job.level))
-        return false
+      if (levelSet.size > 0 && !levelSet.has(job.level)) return false
 
       if (
-        selectedTitleClassification.length > 0 &&
+        titleClassificationSet.size > 0 &&
         !(
-          selectedTitleClassification.includes(job.title_classification) ||
-          (selectedTitleClassification.includes('no-exam') &&
+          titleClassificationSet.has(job.title_classification) ||
+          (titleClassificationSet.has('no-exam') &&
             NON_EXAM_TITLE_CLASSIFICATION.includes(job.title_classification))
         )
       )
         return false
 
-      if (selectedPostingAge.length > 0) {
+      if (postingAgeSet.size > 0) {
         const postingDate = new Date(job.posting_date)
         const ageInDays = (now - postingDate.getTime()) / (1000 * 60 * 60 * 24)
 
-        const matches = selectedPostingAge.some((bucket) => {
-          const days = DATE_BUCKETS.find((b) => b.value === bucket)?.days
-          if (!days) return false
-          if (bucket === 'older') return ageInDays > 365
-          return ageInDays <= days
+        const matches = Array.from(postingAgeSet).some((bucket) => {
+          const days = dateBucketMap[bucket]
+          return days ? ageInDays <= days : false
         })
 
         if (!matches) return false

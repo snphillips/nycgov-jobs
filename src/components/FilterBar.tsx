@@ -102,7 +102,7 @@ export function FilterBar({
         />
         <CheckboxFilter
           id="postingAge"
-          label="Date Posted"
+          label="Date Posted Within"
           options={postingAgeOptions}
           selected={selectedPostingAge}
           onChange={setSelectedPostingAge}

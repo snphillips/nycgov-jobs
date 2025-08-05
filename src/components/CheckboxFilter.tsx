@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export interface Option {
   value: string
@@ -22,13 +22,28 @@ function CheckboxFilter({
   onChange,
 }: CheckboxFilterProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const selectAllRef = useRef<HTMLInputElement>(null)
+
+  const allValues = options.map((opt) => opt.value)
+  const isAllSelected = selected.length === allValues.length
+  const isNoneSelected = selected.length === 0
+  const isIndeterminate = !isAllSelected && !isNoneSelected
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = isIndeterminate
+    }
+  }, [isIndeterminate])
 
   const toggleOption = (value: string) => {
-    console.log('toggleOption:', value)
     const next = selected.includes(value)
       ? selected.filter((v) => v !== value)
       : [...selected, value]
     onChange(next)
+  }
+
+  const toggleAll = () => {
+    onChange(isAllSelected ? [] : allValues)
   }
 
   return (
@@ -60,6 +75,19 @@ function CheckboxFilter({
         style={{ transitionProperty: 'max-height, opacity' }}
       >
         <div className="px-4 py-2 max-h-60 overflow-y-auto">
+          {/* Select All Option */}
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-800 py-1 border-b border-gray-200 mb-2 pb-2">
+            <input
+              ref={selectAllRef}
+              type="checkbox"
+              checked={isAllSelected}
+              onChange={toggleAll}
+              className="rounded border-gray-300 focus:ring-blue-500"
+            />
+            Select All
+          </label>
+
+          {/* Individual Options */}
           {options.map((option) => (
             <label
               key={option.value}
@@ -72,7 +100,8 @@ function CheckboxFilter({
                 onChange={() => toggleOption(option.value)}
                 className="rounded border-gray-300 focus:ring-blue-500"
               />
-              {option.label} ({option.count})
+              {option.label}{' '}
+              {option.count !== undefined ? `(${option.count})` : ''}
             </label>
           ))}
         </div>
