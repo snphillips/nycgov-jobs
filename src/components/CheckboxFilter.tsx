@@ -54,7 +54,7 @@ function CheckboxFilter({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls={`${id}-dropdown`}
-        className="w-full flex items-center justify-between px-4 py-2 bg-white text-sm font-medium text-gray-100 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+        className="w-full flex items-center justify-between px-4 py-2 bg-stone-900 text-sm font-medium text-stone-200 border border-gray-300 rounded-md shadow-sm"
       >
         <span>{label}</span>
         <span
