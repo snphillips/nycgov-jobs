@@ -1,17 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 
+// Represents a single checkbox option
 export interface Option {
   value: string
   label: string
-  count?: number
+  count?: number // Optional display count
 }
 
+// Props expected by the CheckboxFilter component
 interface CheckboxFilterProps {
-  id: string
-  label: string
-  options: Option[]
-  selected: string[]
-  onChange: (values: string[]) => void
+  id: string // Unique ID for accessibility
+  label: string // Label shown on the toggle button
+  options: Option[] // All filter options
+  selected: string[] // Currently selected option values
+  onChange: (values: string[]) => void // Callback to update selected values
 }
 
 function CheckboxFilter({
@@ -21,34 +23,44 @@ function CheckboxFilter({
   selected,
   onChange,
 }: CheckboxFilterProps) {
+  // Controls whether dropdown is open
   const [isOpen, setIsOpen] = useState(false)
+
+  // Ref to the "Select All" checkbox, used for setting indeterminate state
   const selectAllRef = useRef<HTMLInputElement>(null)
 
-  const allValues = options.map((opt) => opt.value)
+  // List of all option values
+  const allValues = options.map((option) => option.value)
+
+  // Boolean flags for "Select All" state
   const isAllSelected = selected.length === allValues.length
   const isNoneSelected = selected.length === 0
   const isIndeterminate = !isAllSelected && !isNoneSelected
 
+  // Set indeterminate state on "Select All" checkbox when appropriate
   useEffect(() => {
     if (selectAllRef.current) {
       selectAllRef.current.indeterminate = isIndeterminate
     }
   }, [isIndeterminate])
 
+  // Toggle individual option on/off
   const toggleOption = (value: string) => {
-    const next = selected.includes(value)
-      ? selected.filter((v) => v !== value)
-      : [...selected, value]
-    onChange(next)
+    const nextState = selected.includes(value)
+      ? selected.filter((val) => val !== value) // if selected, remove it
+      : [...selected, value] // if not selected, add it
+
+    onChange(nextState)
   }
 
+  // Toggle all options: select all or deselect all
   const toggleAll = () => {
     onChange(isAllSelected ? [] : allValues)
   }
 
   return (
     <div className="relative w-full">
-      {/* Toggle button */}
+      {/* Dropdown toggle button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -57,6 +69,7 @@ function CheckboxFilter({
         className="w-full flex items-center justify-between px-4 py-2 bg-stone-900 text-sm font-medium text-stone-200 border border-gray-300 rounded-md shadow-sm"
       >
         <span>{label}</span>
+        {/* ▶ icon rotates when open */}
         <span
           className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
         >
@@ -64,7 +77,7 @@ function CheckboxFilter({
         </span>
       </button>
 
-      {/* Dropdown panel */}
+      {/* Dropdown panel with checkbox options */}
       <div
         id={`${id}-dropdown`}
         className={`absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden transition-all duration-200 ${
@@ -75,7 +88,7 @@ function CheckboxFilter({
         style={{ transitionProperty: 'max-height, opacity' }}
       >
         <div className="px-4 py-2 max-h-60 overflow-y-auto">
-          {/* Select All Option */}
+          {/* "Select All" checkbox at the top */}
           <label className="flex items-center gap-2 text-sm font-medium text-gray-800 py-1 border-b border-gray-200 mb-2 pb-2">
             <input
               ref={selectAllRef}
@@ -87,7 +100,7 @@ function CheckboxFilter({
             Select All
           </label>
 
-          {/* Individual Options */}
+          {/* Individual checkbox options */}
           {options.map((option) => (
             <label
               key={option.value}
@@ -100,6 +113,7 @@ function CheckboxFilter({
                 onChange={() => toggleOption(option.value)}
                 className="rounded border-gray-300 focus:ring-blue-500"
               />
+              {/* Show label and optional count */}
               {option.label}{' '}
               {option.count !== undefined ? `(${option.count})` : ''}
             </label>

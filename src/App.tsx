@@ -62,18 +62,7 @@ export default function App() {
       </div>
 
       <FilterBar {...filterState} {...filterOptions} />
-      <FilterResultsBar
-        filteredJobs={filteredJobs}
-        filterState={{
-          selectedEmploymentKind: filterState.selectedEmploymentKind,
-          selectedSalaryFrequency: filterState.selectedSalaryFrequency,
-          selectedAgencies: filterState.selectedAgencies,
-          selectedTitleClassification: filterState.selectedTitleClassification,
-          selectedCivilServiceTitle: filterState.selectedCivilServiceTitle,
-          selectedLevel: filterState.selectedLevel,
-          selectedPostingAge: filterState.selectedPostingAge,
-        }}
-      />
+      <FilterResultsBar filteredJobs={filteredJobs} filterState={filterState} />
 
       <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-h-screen bg-stone-300">
         {visibleJobs.map((job) => (
