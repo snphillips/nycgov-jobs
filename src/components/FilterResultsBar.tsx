@@ -62,6 +62,10 @@ export function FilterResultsBar({
     return labels
   }
 
+  function onRemove() {
+    console.log('remove filter pill')
+  }
+
   return (
     <div className="flex flex-wrap  items-center gap-2 p-3 text-sm text-stone-300">
       <h2 className="font-semibold">
@@ -76,12 +80,19 @@ export function FilterResultsBar({
         selectedCivilServiceTitle: filterState.selectedCivilServiceTitle,
         selectedLevel: filterState.selectedLevel,
         selectedPostingAge: filterState.selectedPostingAge,
-      }).map((label, idx) => (
+      }).map((label) => (
         <span
-          key={idx}
+          key={label}
           className="px-3 py-1 rounded-full bg-stone-200 text-gray-800 text-xs"
         >
           {label}
+          <button
+            onClick={() => onRemove()}
+            className="ml-1 text-xs text-gray-600 hover:text-black"
+            // aria-label={Remove ${label}}
+          >
+            ×
+          </button>
         </span>
       ))}
     </div>
