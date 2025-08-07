@@ -1,6 +1,5 @@
 import type { NYCJobType } from '../types'
 
-// Props passed into the FilterResultsBar
 interface FilterResultsBarProps {
   filteredJobs: NYCJobType[]
   filterState: {
@@ -21,148 +20,128 @@ interface FilterResultsBarProps {
   }
 }
 
-// All possible filter categories used for filter pills
-type FilterCategory =
-  | 'selectedEmploymentKind'
-  | 'selectedSalaryFrequency'
-  | 'selectedAgencies'
-  | 'selectedTitleClassification'
-  | 'selectedCivilServiceTitle'
-  | 'selectedLevel'
-  | 'selectedPostingAge'
-
-// Structure of each filter pill
-interface FilterPill {
-  value: string
-  label: string
-  category: FilterCategory
-  remove: () => void
-}
-
 export function FilterResultsBar({
   filteredJobs,
   filterState,
 }: FilterResultsBarProps) {
-  // Create an array of filter pills with label + remove logic
-  function buildFilterPills(): FilterPill[] {
-    const pillList: FilterPill[] = []
-
-    // Human-readable mapping for coded filter values
-    const readableLabelMap: Record<string, string> = {
-      F: 'full time',
-      P: 'part time',
-      Annual: 'annual salary',
-      Hourly: 'hourly wage',
-      Daily: 'daily rate',
-      'Competitive-1': 'exam required',
-      'no-exam': 'no exam',
-      '1w': '1 week',
-      '2w': '2 weeks',
-      '3w': '3 weeks',
-      '1m': 'one month',
-      '6m': 'six months',
-    }
-
-    /**
-     * Helper to convert selected values into pills
-     */
-    const addPills = (
-      category: FilterCategory,
-      selectedValues: string[],
-      setSelectedValues: (values: string[]) => void,
-      formatLabel: (value: string) => string = (value) => value
-    ) => {
-      selectedValues.forEach((selectedValue) => {
-        pillList.push({
-          value: selectedValue,
-          category,
-          label: formatLabel(selectedValue),
-          remove: () =>
-            setSelectedValues(
-              selectedValues.filter((v) => v !== selectedValue)
-            ),
-        })
-      })
-    }
-
-    // Build pills for each filter type
-    addPills(
-      'selectedEmploymentKind',
-      filterState.selectedEmploymentKind,
-      filterState.setSelectedEmploymentKind,
-      (value) => readableLabelMap[value] || value
-    )
-
-    addPills(
-      'selectedSalaryFrequency',
-      filterState.selectedSalaryFrequency,
-      filterState.setSelectedSalaryFrequency,
-      (value) => readableLabelMap[value] || value
-    )
-
-    addPills(
-      'selectedTitleClassification',
-      filterState.selectedTitleClassification,
-      filterState.setSelectedTitleClassification,
-      (value) => readableLabelMap[value] || value
-    )
-
-    addPills(
-      'selectedPostingAge',
-      filterState.selectedPostingAge,
-      filterState.setSelectedPostingAge,
-      (value) => readableLabelMap[value] || value
-    )
-
-    addPills(
-      'selectedAgencies',
-      filterState.selectedAgencies,
-      filterState.setSelectedAgencies,
-      (value) => value.toLowerCase()
-    )
-
-    addPills(
-      'selectedCivilServiceTitle',
-      filterState.selectedCivilServiceTitle,
-      filterState.setSelectedCivilServiceTitle,
-      (value) => value.toLowerCase()
-    )
-
-    addPills(
-      'selectedLevel',
-      filterState.selectedLevel,
-      filterState.setSelectedLevel,
-      (value) => `level ${value.toLowerCase()}`
-    )
-
-    return pillList
+  // Map raw filter values to user-friendly labels
+  const labelMap: Record<string, string> = {
+    F: 'full time',
+    P: 'part time',
+    Annual: 'annual salary',
+    Hourly: 'hourly wage',
+    Daily: 'daily rate',
+    'Competitive-1': 'exam required',
+    'no-exam': 'no exam',
+    '1w': '1 week',
+    '2w': '2 weeks',
+    '3w': '3 weeks',
+    '1m': 'one month',
+    '6m': 'six months',
   }
 
-  const selectedFilterPills = buildFilterPills()
+  const filterConfigs = [
+    {
+      category: 'employment',
+      values: filterState.selectedEmploymentKind,
+      setValues: filterState.setSelectedEmploymentKind,
+      format: (val: string) => labelMap[val] || val,
+      color: 'bg-blue-100 text-blue-800',
+    },
+    {
+      category: 'salary',
+      values: filterState.selectedSalaryFrequency,
+      setValues: filterState.setSelectedSalaryFrequency,
+      format: (val: string) => labelMap[val] || val,
+      color: 'bg-green-100 text-green-800',
+    },
+    {
+      category: 'classification',
+      values: filterState.selectedTitleClassification,
+      setValues: filterState.setSelectedTitleClassification,
+      format: (val: string) => labelMap[val] || val,
+      color: 'bg-purple-100 text-purple-800',
+    },
+    {
+      category: 'postingAge',
+      values: filterState.selectedPostingAge,
+      setValues: filterState.setSelectedPostingAge,
+      format: (val: string) => labelMap[val] || val,
+      color: 'bg-yellow-100 text-yellow-800',
+    },
+    {
+      category: 'agency',
+      values: filterState.selectedAgencies,
+      setValues: filterState.setSelectedAgencies,
+      format: (val: string) => val.toLowerCase(),
+      color: 'bg-lime-100 text-lime-800',
+    },
+    {
+      category: 'civilService',
+      values: filterState.selectedCivilServiceTitle,
+      setValues: filterState.setSelectedCivilServiceTitle,
+      format: (val: string) => val.toLowerCase(),
+      color: 'bg-orange-100 text-orange-800',
+    },
+    {
+      category: 'level',
+      values: filterState.selectedLevel,
+      setValues: filterState.setSelectedLevel,
+      format: (val: string) => `level ${val.toLowerCase()}`,
+      color: 'bg-sky-100 text-sky-800',
+    },
+  ]
+
+  const filterPills = filterConfigs.flatMap(
+    ({ category, values, setValues, format, color }) =>
+      values.map((value) => ({
+        label: format(value),
+        onRemove: () => setValues(values.filter((v) => v !== value)),
+        category,
+        color,
+      }))
+  )
+
+  const clearAllFilters = () => {
+    filterState.setSelectedEmploymentKind([])
+    filterState.setSelectedSalaryFrequency([])
+    filterState.setSelectedAgencies([])
+    filterState.setSelectedTitleClassification([])
+    filterState.setSelectedCivilServiceTitle([])
+    filterState.setSelectedLevel([])
+    filterState.setSelectedPostingAge([])
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-2 p-3 text-sm text-stone-300">
-      {/* Job count header */}
       <h2 className="font-semibold">
         {filteredJobs.length} jobs match your criteria
       </h2>
 
-      {/* Display selected filter pills with remove buttons */}
-      {selectedFilterPills.map((pill) => (
+      {filterPills.map(({ label, onRemove, color }, index) => (
         <span
-          key={`${pill.category}-${pill.value}`}
-          className="flex items-center gap-1 px-3 py-1 rounded-full bg-stone-200 text-gray-800 text-xs"
+          key={`${label}-${index}`}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${color}`}
         >
-          {pill.label}
+          {label}
           <button
-            onClick={pill.remove}
-            className="ml-1 text-xs text-gray-600 hover:text-black"
-            aria-label={`Remove ${pill.label} filter`}
+            onClick={onRemove}
+            className="ml-1 text-xs hover:text-black"
+            aria-label={`remove ${label} filter`}
           >
             ×
           </button>
         </span>
       ))}
+
+      {filterPills.length > 0 && (
+        <button
+          onClick={clearAllFilters}
+          className="ml-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium hover:bg-red-200"
+        >
+          Clear all filters
+        </button>
+      )}
     </div>
   )
 }
