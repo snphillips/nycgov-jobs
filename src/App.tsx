@@ -5,6 +5,8 @@ import { JobCards } from './components/JobCards'
 import { FilterBar } from './components/FilterBar'
 import { FilterResultsBar } from './components/FilterResultsBar'
 import type { NYCJobType } from './types'
+import { HeartIcon } from '@heroicons/react/24/solid'
+import { EyeSlashIcon } from '@heroicons/react/24/solid'
 
 export default function App() {
   const PAGE_SIZE = 12
@@ -68,7 +70,24 @@ export default function App() {
 
   return (
     <>
-      <h1 className="p-6">nyc gov job search</h1>
+      <header className="flex items-center justify-between">
+        <h1 className="p-6">nyc gov job search</h1>
+        {/* Right side: icons */}
+        <div className="flex items-center gap-4">
+          {/* Favorited jobs */}
+          <HeartIcon
+            aria-label="Favorited jobs"
+            className="h-6 w-6 text-gray-200 cursor-pointer hover:text-red-400"
+          />
+
+          {/* Hidden jobs */}
+          <EyeSlashIcon
+            aria-label="Hidden jobs"
+            className="h-6 w-6 text-gray-200 cursor-pointer hover:text-gray-400"
+          />
+        </div>
+      </header>
+
       <div className="pl-6 pb-6 font-semibold">
         Filter recent NYC.gov jobs for current non-employees. Jobs renew weekly.
       </div>
