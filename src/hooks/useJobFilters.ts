@@ -24,14 +24,14 @@ export function useJobFilters(jobs: NYCJobType[]) {
   const [selectedSalaryFrequency, setSelectedSalaryFrequency] = useState<
     string[]
   >([])
-  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([])
+  const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
   const [selectedTitleClassification, setSelectedTitleClassification] =
     useState<string[]>([])
+  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([])
   const [selectedCivilServiceTitle, setSelectedCivilServiceTitle] = useState<
     string[]
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
-  const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
 
   const now = Date.now()
 

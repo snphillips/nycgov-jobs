@@ -16,7 +16,7 @@ export default function Favorites({
         <JobCard
           key={`${job.job_id}-${job.posting_updated}`}
           job={job}
-          onFavorite={toggleFavorite}
+          toggleFavorite={toggleFavorite}
           isFavorited={favoriteJobs.has(job.job_id)}
         />
       ))}

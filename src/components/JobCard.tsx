@@ -1,12 +1,15 @@
 import clsx from 'clsx'
 import type { NYCJobType } from '../types'
 import { cleanText } from '../utils.ts'
-import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid'
+import { HeartIcon } from '@heroicons/react/24/solid'
+import { EyeSlashIcon } from '@heroicons/react/24/solid'
 
 interface JobCardProps {
   job: NYCJobType
-  onFavorite: (job: NYCJobType) => void
+  toggleFavorite: (job: NYCJobType) => void
+  toggleHide: (job: NYCJobType) => void
   isFavorited?: boolean
+  isHidden?: boolean
 }
 
 /* ───────────── Helpers ───────────── */
@@ -22,7 +25,13 @@ const formatSalary = (from: string, to: string, freq: string) => {
   return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
 }
 
-function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
+function JobCard({
+  job,
+  toggleFavorite,
+  toggleHide,
+  isFavorited = false,
+  isHidden = false,
+}: JobCardProps) {
   const employmentType =
     job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time'
 
@@ -34,20 +43,31 @@ function JobCard({ job, onFavorite, isFavorited = false }: JobCardProps) {
       {/* Header Row */}
       <header className="flex flex-col gap-1">
         <div className="flex flex-row justify-between">
-          <h3 className="text-2l font-semibold leading-tight text-amber-950">
+          <h3 className="font-semibold leading-tight text-amber-950">
             {job.business_title}
           </h3>
           {/* Heart Favorite Button */}
           {/* <div className="relative"> */}
           <button
             className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
-            onClick={() => onFavorite(job)}
+            onClick={() => toggleFavorite(job)}
             aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
           >
             {isFavorited ? (
-              <SolidHeart className="h-6 w-6 text-red-600" />
+              <HeartIcon className="h-6 w-6 text-red-600" />
             ) : (
-              <SolidHeart className="h-6 w-6" />
+              <HeartIcon className="h-6 w-6" />
+            )}
+          </button>
+          <button
+            className="hide-button top-0 right-0 bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
+            onClick={() => toggleHide(job)}
+            aria-label={'Hide job'}
+          >
+            {isHidden ? (
+              <EyeSlashIcon className="h-6 w-6 text-gray-600" />
+            ) : (
+              <EyeSlashIcon className="h-6 w-6" />
             )}
           </button>
         </div>

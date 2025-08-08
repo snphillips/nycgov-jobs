@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNYCJobs } from './hooks/useNYCJobs'
 import { useJobFilters } from './hooks/useJobFilters'
-import JobCard from './components/JobCard'
+import { JobCards } from './components/JobCards'
 import { FilterBar } from './components/FilterBar'
 import { FilterResultsBar } from './components/FilterResultsBar'
 import type { NYCJobType } from './types'
@@ -11,6 +11,7 @@ export default function App() {
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
   const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(new Set())
+  const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   // const [applied, setApplied] = useState<Set<string>>(new Set())
 
@@ -41,14 +42,25 @@ export default function App() {
 
   const toggleFavorite = (job: NYCJobType) =>
     setFavoriteJobs((prev) => {
-      const next = new Set(prev)
-      if (next.has(job.job_id)) {
-        next.delete(job.job_id)
+      const nextState = new Set(prev)
+      if (nextState.has(job.job_id)) {
+        nextState.delete(job.job_id)
       } else {
-        next.add(job.job_id)
+        nextState.add(job.job_id)
       }
+      return nextState
+    })
 
-      return next
+  const toggleHide = (job: NYCJobType) =>
+    setHiddenJobs((prev) => {
+      console.log('toggle hide', job.job_id)
+      const nextState = new Set(prev)
+      if (nextState.has(job.job_id)) {
+        nextState.delete(job.job_id)
+      } else {
+        nextState.add(job.job_id)
+      }
+      return nextState
     })
 
   if (loading) return <p className="p-6">Loading NYC job listings…</p>
@@ -64,18 +76,13 @@ export default function App() {
       <FilterBar {...filterState} {...filterOptions} />
       <FilterResultsBar filteredJobs={filteredJobs} filterState={filterState} />
 
-      <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-h-screen bg-stone-300">
-        {visibleJobs.map((job) => (
-          <JobCard
-            key={`${job.job_id}-${job.posting_updated}`}
-            job={job}
-            onFavorite={toggleFavorite}
-            isFavorited={favoriteJobs.has(job.job_id)}
-            // onApplied={markApplied}
-            // isApplied={applied.has(job.job_id)}
-          />
-        ))}
-      </main>
+      <JobCards
+        visibleJobs={visibleJobs}
+        favoriteJobs={favoriteJobs}
+        toggleFavorite={toggleFavorite}
+        hiddenJobs={hiddenJobs}
+        toggleHide={toggleHide}
+      />
       <div ref={loaderRef} className="h-10" />
     </>
   )

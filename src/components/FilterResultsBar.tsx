@@ -46,59 +46,59 @@ export function FilterResultsBar({
       values: filterState.selectedEmploymentKind,
       setValues: filterState.setSelectedEmploymentKind,
       format: (val: string) => labelMap[val] || val,
-      color: 'bg-blue-100 text-blue-800',
+      filterPillColor: 'bg-blue-100 text-blue-800',
     },
     {
       category: 'salary',
       values: filterState.selectedSalaryFrequency,
       setValues: filterState.setSelectedSalaryFrequency,
       format: (val: string) => labelMap[val] || val,
-      color: 'bg-green-100 text-green-800',
+      filterPillColor: 'bg-green-100 text-green-800',
     },
     {
       category: 'classification',
       values: filterState.selectedTitleClassification,
       setValues: filterState.setSelectedTitleClassification,
       format: (val: string) => labelMap[val] || val,
-      color: 'bg-purple-100 text-purple-800',
+      filterPillColor: 'bg-purple-100 text-purple-800',
     },
     {
       category: 'postingAge',
       values: filterState.selectedPostingAge,
       setValues: filterState.setSelectedPostingAge,
       format: (val: string) => labelMap[val] || val,
-      color: 'bg-yellow-100 text-yellow-800',
+      filterPillColor: 'bg-yellow-100 text-yellow-800',
     },
     {
       category: 'agency',
       values: filterState.selectedAgencies,
       setValues: filterState.setSelectedAgencies,
       format: (val: string) => val.toLowerCase(),
-      color: 'bg-lime-100 text-lime-800',
+      filterPillColor: 'bg-lime-100 text-lime-800',
     },
     {
       category: 'civilService',
       values: filterState.selectedCivilServiceTitle,
       setValues: filterState.setSelectedCivilServiceTitle,
       format: (val: string) => val.toLowerCase(),
-      color: 'bg-orange-100 text-orange-800',
+      filterPillColor: 'bg-orange-100 text-orange-800',
     },
     {
       category: 'level',
       values: filterState.selectedLevel,
       setValues: filterState.setSelectedLevel,
       format: (val: string) => `level ${val.toLowerCase()}`,
-      color: 'bg-sky-100 text-sky-800',
+      filterPillColor: 'bg-sky-100 text-sky-800',
     },
   ]
 
   const filterPills = filterConfigs.flatMap(
-    ({ category, values, setValues, format, color }) =>
+    ({ category, values, setValues, format, filterPillColor }) =>
       values.map((value) => ({
         label: format(value),
         onRemove: () => setValues(values.filter((v) => v !== value)),
         category,
-        color,
+        filterPillColor,
       }))
   )
 
@@ -113,15 +113,15 @@ export function FilterResultsBar({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-3 text-sm text-stone-300">
+    <div className="flex flex-wrap items-center gap-2 p-6 text-sm text-stone-300">
       <h2 className="font-semibold">
         {filteredJobs.length} jobs match your criteria
       </h2>
 
-      {filterPills.map(({ label, onRemove, color }, index) => (
+      {filterPills.map(({ label, onRemove, filterPillColor }, index) => (
         <span
           key={`${label}-${index}`}
-          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${color}`}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${filterPillColor}`}
         >
           {label}
           <button
@@ -139,7 +139,7 @@ export function FilterResultsBar({
           onClick={clearAllFilters}
           className="ml-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium hover:bg-red-200"
         >
-          Clear all filters
+          🧹 Clear all filters
         </button>
       )}
     </div>
