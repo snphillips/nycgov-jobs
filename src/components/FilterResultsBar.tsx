@@ -18,11 +18,17 @@ interface FilterResultsBarProps {
     selectedPostingAge: string[]
     setSelectedPostingAge: (val: string[]) => void
   }
+  showFavoriteJobs: boolean
+  showHiddenJobs: boolean
+  onShowAllJobs: () => void
 }
 
 export function FilterResultsBar({
   filteredJobs,
   filterState,
+  showFavoriteJobs,
+  showHiddenJobs,
+  onShowAllJobs,
 }: FilterResultsBarProps) {
   // Map raw filter values to user-friendly labels
   const labelMap: Record<string, string> = {
@@ -40,6 +46,7 @@ export function FilterResultsBar({
     '6m': 'six months',
   }
 
+  // Filter category configs (with pill colors)
   const filterConfigs = [
     {
       category: 'employment',
@@ -92,16 +99,20 @@ export function FilterResultsBar({
     },
   ]
 
-  const filterPills = filterConfigs.flatMap(
-    ({ category, values, setValues, format, filterPillColor }) =>
-      values.map((value) => ({
-        label: format(value),
-        onRemove: () => setValues(values.filter((v) => v !== value)),
-        category,
-        filterPillColor,
-      }))
-  )
+  // Flatten into pill models (only used in normal mode)
+  const filterPills =
+    showFavoriteJobs || showHiddenJobs
+      ? []
+      : filterConfigs.flatMap(
+          ({ values, setValues, format, filterPillColor }) =>
+            values.map((value) => ({
+              label: format(value),
+              onRemove: () => setValues(values.filter((v) => v !== value)),
+              filterPillColor,
+            }))
+        )
 
+  // Clear all filters at once (hidden in favorites/hidden modes)
   const clearAllFilters = () => {
     filterState.setSelectedEmploymentKind([])
     filterState.setSelectedSalaryFrequency([])
@@ -112,12 +123,35 @@ export function FilterResultsBar({
     filterState.setSelectedPostingAge([])
   }
 
+  let dynamicHeaderText = `${filteredJobs.length} jobs match your criteria`
+  if (showFavoriteJobs) {
+    dynamicHeaderText = `Showing ${filteredJobs.length} favorite job${
+      filteredJobs.length !== 1 ? 's' : ''
+    }`
+  } else if (showHiddenJobs) {
+    dynamicHeaderText = `Showing ${filteredJobs.length} hidden job${
+      filteredJobs.length !== 1 ? 's' : ''
+    }`
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-2 p-6 text-sm text-stone-300">
-      <h2 className="font-semibold">
-        {filteredJobs.length} jobs match your criteria
+      <h2 className="filter-results-bar-header font-semibold">
+        {dynamicHeaderText}
       </h2>
 
+      {(showFavoriteJobs || showHiddenJobs) && (
+        <button
+          type="button"
+          onClick={onShowAllJobs}
+          className="ml-2 px-3 py-1 rounded-full bg-stone-200 text-stone-800 text-xs font-medium hover:bg-stone-300"
+          aria-label="Back to all jobs"
+        >
+          ← Back to all jobs
+        </button>
+      )}
+
+      {/* Pills only when showing regular filter results */}
       {filterPills.map(({ label, onRemove, filterPillColor }, index) => (
         <span
           key={`${label}-${index}`}
@@ -134,7 +168,8 @@ export function FilterResultsBar({
         </span>
       ))}
 
-      {filterPills.length > 0 && (
+      {/* Clear-all only in regular filter mode and when there are pills */}
+      {filterPills.length > 0 && !showFavoriteJobs && !showHiddenJobs && (
         <button
           onClick={clearAllFilters}
           className="ml-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium hover:bg-red-200"
