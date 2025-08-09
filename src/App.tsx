@@ -83,7 +83,7 @@ export default function App() {
           {/* Hidden jobs */}
           <EyeSlashIcon
             aria-label="Hidden jobs"
-            className="h-6 w-6 text-gray-200 cursor-pointer hover:text-gray-400"
+            className="h-6 w-6 mr-6 text-gray-200 cursor-pointer hover:text-gray-400"
           />
         </div>
       </header>

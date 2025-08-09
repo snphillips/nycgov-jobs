@@ -40,38 +40,38 @@ function JobCard({
 
   return (
     <section className="w-full bg-stone-100 shadow-md rounded-lg p-4 flex flex-col gap-6 border-b h-100 overflow-scroll">
-      {/* Header Row */}
-      <header className="flex flex-col gap-1">
-        <div className="flex flex-row justify-between">
+      <header className="card-header flex flex-col gap-1">
+        <div className="title-icons-row flex flex-row justify-between">
+          {/* Left side: title */}
           <h3 className="font-semibold leading-tight text-amber-950">
             {job.business_title}
           </h3>
-          {/* Heart Favorite Button */}
-          {/* <div className="relative"> */}
-          <button
-            className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
-            onClick={() => toggleFavorite(job)}
-            aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
-          >
-            {isFavorited ? (
-              <HeartIcon className="h-6 w-6 text-red-600" />
-            ) : (
-              <HeartIcon className="h-6 w-6" />
-            )}
-          </button>
-          <button
-            className="hide-button top-0 right-0 bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
-            onClick={() => toggleHide(job)}
-            aria-label={'Hide job'}
-          >
-            {isHidden ? (
-              <EyeSlashIcon className="h-6 w-6 text-gray-600" />
-            ) : (
-              <EyeSlashIcon className="h-6 w-6" />
-            )}
-          </button>
+          {/* Right side: icons */}
+          <div>
+            <button
+              className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
+              onClick={() => toggleFavorite(job)}
+              aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
+            >
+              {isFavorited ? (
+                <HeartIcon className="h-6 w-6 text-red-600" />
+              ) : (
+                <HeartIcon className="h-6 w-6" />
+              )}
+            </button>
+            <button
+              className="hide-button top-0 right-0 bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
+              onClick={() => toggleHide(job)}
+              aria-label={'Hide job'}
+            >
+              {isHidden ? (
+                <EyeSlashIcon className="h-6 w-6 text-gray-600" />
+              ) : (
+                <EyeSlashIcon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
-        {/* </div> */}
         <p className="text-sm text-gray-500">{job.agency}</p>
         <div className="flex flex-wrap gap-2 mt-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
