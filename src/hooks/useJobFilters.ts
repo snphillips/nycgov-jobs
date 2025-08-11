@@ -32,6 +32,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     string[]
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
+  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<number[]>([])
 
   const now = Date.now()
 
@@ -73,6 +74,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     const levelSet = new Set(selectedLevel)
     const titleClassificationSet = new Set(selectedTitleClassification)
     const postingAgeSet = new Set(selectedPostingAge)
+    const salaryFromSet = new Set(selectedSalaryFrom)
 
     const dateBucketMap = DATE_BUCKETS.reduce(
       (acc, b) => {
@@ -101,6 +103,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
         civilServiceTitleSet.size > 0 &&
         !civilServiceTitleSet.has(job.civil_service_title)
       )
+        return false
+
+      if (salaryFromSet.size > 0 && !salaryFromSet.has(job.salary_range_from))
         return false
 
       if (levelSet.size > 0 && !levelSet.has(job.level)) return false
@@ -137,6 +142,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedLevel,
     selectedPostingAge,
     selectedTitleClassification,
+    selectedSalaryFrom,
     now,
     uniqueJobs,
   ])
@@ -221,6 +227,21 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
+  const salaryFromOptions = useMemo(() => {
+    const counts: Record<number, number> = {}
+    uniqueJobs.forEach((job) => {
+      if (job.salary_range_from)
+        counts[job.salary_range_from] = (counts[job.salary_range_from] || 0) + 1
+    })
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([salary_range_from, count]) => ({
+        value: salary_range_from,
+        label: toTitleCase(salary_range_from),
+        count,
+      }))
+  }, [uniqueJobs])
+
   const levelOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     uniqueJobs.forEach((job) => {
@@ -280,6 +301,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedLevel,
       selectedPostingAge,
       setSelectedPostingAge,
+      selectedSalaryFrom,
+      setSelectedSalaryFrom,
     },
     filterOptions: {
       employmentKindOptions,
@@ -290,6 +313,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       civilServiceTitleOptions,
       levelOptions,
       postingAgeOptions,
+      salaryFromOptions,
     },
   }
 }

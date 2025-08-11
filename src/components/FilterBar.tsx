@@ -29,6 +29,10 @@ interface FilterBarProps {
   selectedPostingAge: string[]
   setSelectedPostingAge: React.Dispatch<React.SetStateAction<string[]>>
   postingAgeOptions: Option[]
+
+  selectedSalaryFrom: number[]
+  setSelectedSalaryFrom: React.Dispatch<React.SetStateAction<number[]>>
+  SalaryFromOptions: Option[]
 }
 
 export function FilterBar({
@@ -53,6 +57,9 @@ export function FilterBar({
   postingAgeOptions,
   selectedPostingAge,
   setSelectedPostingAge,
+  salaryFromOptions,
+  selectedSalaryFrom,
+  setSelectedSalaryFrom,
 }: FilterBarProps) {
   return (
     <section className="bg-stone-300 p-4 md:p-4 shadow-sm">
@@ -106,6 +113,13 @@ export function FilterBar({
           options={postingAgeOptions}
           selected={selectedPostingAge}
           onChange={setSelectedPostingAge}
+        />
+        <CheckboxFilter
+          id="salaryFrom"
+          label="Starting Salary"
+          options={salaryFromOptions}
+          selected={selectedSalaryFrom}
+          onChange={setSelectedSalaryFrom}
         />
       </div>
     </section>

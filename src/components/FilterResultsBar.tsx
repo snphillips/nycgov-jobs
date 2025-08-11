@@ -17,6 +17,8 @@ interface FilterResultsBarProps {
     setSelectedLevel: (val: string[]) => void
     selectedPostingAge: string[]
     setSelectedPostingAge: (val: string[]) => void
+    selectedSalaryFrom: number[]
+    setSelectedSalaryFrom: (val: number[]) => void
   }
   showFavoriteJobs: boolean
   showHiddenJobs: boolean
@@ -97,6 +99,13 @@ export function FilterResultsBar({
       format: (val: string) => `level ${val.toLowerCase()}`,
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
+    {
+      category: 'salary_range_from',
+      values: filterState.selectedLevel,
+      setValues: filterState.setSelectedLevel,
+      format: (val: number) => `$ ${val}`,
+      filterPillColor: 'bg-sky-100 text-sky-800',
+    },
   ]
 
   // Flatten into pill models (only used in normal mode)
@@ -121,6 +130,7 @@ export function FilterResultsBar({
     filterState.setSelectedCivilServiceTitle([])
     filterState.setSelectedLevel([])
     filterState.setSelectedPostingAge([])
+    filterState.setSelectedSalaryFrom([])
   }
 
   let dynamicHeaderText = `${filteredJobs.length} jobs match your criteria`
