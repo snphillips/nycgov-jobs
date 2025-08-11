@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNYCJobs } from './hooks/useNYCJobs'
+import { useDebouncedLocalStorage } from './hooks/useDebouncedLocalStorage'
 import { useJobFilters } from './hooks/useJobFilters'
 import { JobCards } from './components/JobCards'
 import { FilterBar } from './components/FilterBar'
 import { FilterResultsBar } from './components/FilterResultsBar'
 import type { NYCJobType } from './types'
 import { HeartIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
   const PAGE_SIZE = 12
@@ -13,7 +15,6 @@ export default function App() {
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
 
-  // --- state (hydrate in initializer; no "load" effect needed) ---
   const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(() =>
     loadSet('favoriteJobs')
   )
@@ -55,7 +56,6 @@ export default function App() {
       return next
     })
 
-  // helpers (optional but tidy)
   function loadSet(key: string): Set<string> {
     try {
       const raw = localStorage.getItem(key)
@@ -66,21 +66,10 @@ export default function App() {
       return new Set()
     }
   }
-  function saveSet(key: string, set: Set<string>) {
-    try {
-      localStorage.setItem(key, JSON.stringify([...set]))
-    } catch {
-      // storage may be full or unavailable; ignore gracefully
-    }
-  }
 
-  useEffect(() => {
-    saveSet('favoriteJobs', favoriteJobs)
-  }, [favoriteJobs])
-
-  useEffect(() => {
-    saveSet('hiddenJobs', hiddenJobs)
-  }, [hiddenJobs])
+  // Debounced saves
+  useDebouncedLocalStorage('favoriteJobs', [...favoriteJobs])
+  useDebouncedLocalStorage('hiddenJobs', [...hiddenJobs])
 
   /* *******************************
    * DISPLAY MODE TOGGLES (UI)
@@ -174,6 +163,7 @@ export default function App() {
    * ***************************** */
   return (
     <>
+      <Toaster position="top-center" />
       <header className="flex items-center justify-between">
         <h1 className="p-6">nyc gov job search</h1>
 
