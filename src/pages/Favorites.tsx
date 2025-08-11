@@ -1,6 +1,8 @@
 import JobCard from '../components/JobCard'
 import type { NYCJobType } from '../types'
 
+// Not using yet - maybe never?
+
 interface FavoritesProps {
   toggleFavorite: () => void
   favoriteJobs: any

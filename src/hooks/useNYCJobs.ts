@@ -4,7 +4,7 @@ import { fetchJobs } from '../api/fetchJobs'
 import { getJobsFromDB, getCacheTimestamp, saveJobsToDB } from '../db'
 
 const RETRIEVAL_LIMIT = 1500
-const MAX_AGE_DAYS = 0.000000001
+const MAX_AGE_DAYS = 2
 const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000
 const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 183
 
@@ -22,10 +22,10 @@ export function useNYCJobs() {
         const now = Date.now()
 
         if (timestamp && now - timestamp < MAX_AGE_MS) {
-          const cached = await getJobsFromDB()
-          console.log('Data is young. Get cached data from DB')
-          if (!abort && cached) {
-            setJobs(cached)
+          const cachedJobs = await getJobsFromDB()
+          console.log('Data is young. Get cachedJobs data from DB')
+          if (!abort && cachedJobs) {
+            setJobs(cachedJobs)
             setLoading(false)
             return
           }

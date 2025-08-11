@@ -13,8 +13,13 @@ export default function App() {
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
 
-  const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(new Set())
-  const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(new Set())
+  // --- state (hydrate in initializer; no "load" effect needed) ---
+  const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(() =>
+    loadSet('favoriteJobs')
+  )
+  const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(() =>
+    loadSet('hiddenJobs')
+  )
 
   const [showFavoriteJobs, setShowFavoriteJobs] = useState(false)
   const [showHiddenJobs, setShowHiddenJobs] = useState(false)
@@ -49,6 +54,33 @@ export default function App() {
       }
       return next
     })
+
+  // helpers (optional but tidy)
+  function loadSet(key: string): Set<string> {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return new Set()
+      const arr = JSON.parse(raw)
+      return Array.isArray(arr) ? new Set(arr) : new Set()
+    } catch {
+      return new Set()
+    }
+  }
+  function saveSet(key: string, set: Set<string>) {
+    try {
+      localStorage.setItem(key, JSON.stringify([...set]))
+    } catch {
+      // storage may be full or unavailable; ignore gracefully
+    }
+  }
+
+  useEffect(() => {
+    saveSet('favoriteJobs', favoriteJobs)
+  }, [favoriteJobs])
+
+  useEffect(() => {
+    saveSet('hiddenJobs', hiddenJobs)
+  }, [hiddenJobs])
 
   /* *******************************
    * DISPLAY MODE TOGGLES (UI)
