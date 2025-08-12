@@ -30,9 +30,9 @@ interface FilterBarProps {
   setSelectedPostingAge: React.Dispatch<React.SetStateAction<string[]>>
   postingAgeOptions: Option[]
 
-  selectedSalaryFrom: number[]
-  setSelectedSalaryFrom: React.Dispatch<React.SetStateAction<number[]>>
-  SalaryFromOptions: Option[]
+  selectedSalaryFrom: string[]
+  setSelectedSalaryFrom: React.Dispatch<React.SetStateAction<string[]>>
+  salaryFromOptions: Option[]
 }
 
 export function FilterBar({

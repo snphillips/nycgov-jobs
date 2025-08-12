@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
-import { toTitleCase } from '../utils'
+import { toTitleCase, currencyFormatter } from '../utils'
 
 const NON_EXAM_TITLE_CLASSIFICATION = [
   'Pending Classification-2',
@@ -32,7 +32,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     string[]
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
-  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<number[]>([])
+  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([])
 
   const now = Date.now()
 
@@ -84,7 +84,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       {} as Record<string, number>
     )
 
-    return uniqueJobs.filter((job) => {
+    return uniqueJobs.filter((job: NYCJobType) => {
       if (
         employmentKindSet.size > 0 &&
         !employmentKindSet.has(job.full_time_part_time_indicator)
@@ -228,16 +228,21 @@ export function useJobFilters(jobs: NYCJobType[]) {
   }, [uniqueJobs])
 
   const salaryFromOptions = useMemo(() => {
-    const counts: Record<number, number> = {}
-    uniqueJobs.forEach((job) => {
-      if (job.salary_range_from)
-        counts[job.salary_range_from] = (counts[job.salary_range_from] || 0) + 1
-    })
-    return Object.entries(counts)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([salary_range_from, count]) => ({
-        value: salary_range_from,
-        label: toTitleCase(salary_range_from),
+    // Count occurrences keyed by the numeric starting salary
+    const counts = new Map<number, number>()
+
+    for (const job of uniqueJobs) {
+      const amount = Number(job.salary_range_from)
+      if (!Number.isFinite(amount) || amount <= 0) continue
+      counts.set(amount, (counts.get(amount) ?? 0) + 1)
+    }
+
+    // Sort numerically (low → high), then map to { value, label, count }
+    return Array.from(counts.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([amount, count]) => ({
+        value: String(amount), // raw value for filtering
+        label: currencyFormatter(amount), // pretty label, e.g. "$75,000"
         count,
       }))
   }, [uniqueJobs])

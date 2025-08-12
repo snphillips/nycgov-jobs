@@ -1,11 +1,11 @@
-import type { NYCJobType } from "./types";
+import type { NYCJobType } from './types'
 
 export function toTitleCase(input: string) {
   return input
     .toLowerCase()
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
 // The app is interprets characters with the wrong encoding
@@ -15,15 +15,14 @@ export function toTitleCase(input: string) {
 export function cleanText(text: string): string {
   return text
     .replace(/â¢/g, '\n• ') // newline + bullet point
-    .replace(/â/g, '’')    // right single quote
-    .replace(/â/g, '“')    // left double quote
-    .replace(/â/g, '”')    // right double quote
-    .replace(/â”/g, '—')    // em dash
-    .replace(/â¦/g, '…')    // ellipsis
-    .replace(/â/g, `'`)    // fallback apostrophe
-    .replace(/(\d+\.)\s*/g, '\n$1 '); // ← key line: adds a line break before 1. 2. etc.
+    .replace(/â/g, '’') // right single quote
+    .replace(/â/g, '“') // left double quote
+    .replace(/â/g, '”') // right double quote
+    .replace(/â”/g, '—') // em dash
+    .replace(/â¦/g, '…') // ellipsis
+    .replace(/â/g, `'`) // fallback apostrophe
+    .replace(/(\d+\.)\s*/g, '\n$1 ') // ← key line: adds a line break before 1. 2. etc.
 }
-
 
 export function isInternalJob(job: NYCJobType): boolean {
   const combinedText = [
@@ -32,8 +31,28 @@ export function isInternalJob(job: NYCJobType): boolean {
     job.to_apply,
   ]
     .join(' ')
-    .toLowerCase();
+    .toLowerCase()
 
-    const internalRegex = /open\s+to\s+.*?\s+employees\s+only|for\s+.*?\s+employees\s+only|only\s+permanent\s+employees\s+in\s+the\s+title|open\s+to\s+current\s+employees\s+only|restricted\s+to\s+.*?\s+employees/;
-  return internalRegex.test(combinedText);
+  const internalRegex =
+    /open\s+to\s+.*?\s+employees\s+only|for\s+.*?\s+employees\s+only|only\s+permanent\s+employees\s+in\s+the\s+title|open\s+to\s+current\s+employees\s+only|restricted\s+to\s+.*?\s+employees/
+  return internalRegex.test(combinedText)
+}
+
+export const usdFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+})
+
+export const currencyFormatter = (amount: number): string => {
+  return usdFormatter.format(amount)
+}
+
+// Format a salary range with frequency
+export const formatSalaryRangeFrequency = (
+  from: string,
+  to: string,
+  freq: string
+): string => {
+  return `${currencyFormatter(Number(from))} – ${currencyFormatter(Number(to))} ${freq}`
 }

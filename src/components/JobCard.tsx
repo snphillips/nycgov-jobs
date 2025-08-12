@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import type { NYCJobType } from '../types'
-import { cleanText } from '../utils.ts'
+import { cleanText, formatSalaryRangeFrequency } from '../utils.ts'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { EyeSlashIcon } from '@heroicons/react/24/solid'
 
@@ -16,14 +16,14 @@ interface JobCardProps {
 const isExamRequired = (classification: string) =>
   classification.startsWith('Competitive')
 
-const formatSalary = (from: string, to: string, freq: string) => {
-  const f = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  })
-  return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
-}
+// const formatSalaryRangeFrequency = (from: string, to: string, freq: string) => {
+//   const f = new Intl.NumberFormat('en-US', {
+//     style: 'currency',
+//     currency: 'USD',
+//     maximumFractionDigits: 0,
+//   })
+//   return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
+// }
 
 function JobCard({
   job,
@@ -103,7 +103,7 @@ function JobCard({
         <dd>{postedDate}</dd>
         <dt className="font-medium">Salary Range</dt>
         <dd>
-          {formatSalary(
+          {formatSalaryRangeFrequency(
             job.salary_range_from,
             job.salary_range_to,
             job.salary_frequency

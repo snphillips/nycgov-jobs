@@ -17,8 +17,8 @@ interface FilterResultsBarProps {
     setSelectedLevel: (val: string[]) => void
     selectedPostingAge: string[]
     setSelectedPostingAge: (val: string[]) => void
-    selectedSalaryFrom: number[]
-    setSelectedSalaryFrom: (val: number[]) => void
+    selectedSalaryFrom: string[]
+    setSelectedSalaryFrom: (val: string[]) => void
   }
   showFavoriteJobs: boolean
   showHiddenJobs: boolean
@@ -58,7 +58,7 @@ export function FilterResultsBar({
       filterPillColor: 'bg-blue-100 text-blue-800',
     },
     {
-      category: 'salary',
+      category: 'salaryFrequency',
       values: filterState.selectedSalaryFrequency,
       setValues: filterState.setSelectedSalaryFrequency,
       format: (val: string) => labelMap[val] || val,
@@ -100,10 +100,10 @@ export function FilterResultsBar({
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
     {
-      category: 'salary_range_from',
-      values: filterState.selectedLevel,
-      setValues: filterState.setSelectedLevel,
-      format: (val: number) => `$ ${val}`,
+      category: 'salaryRangeFrom',
+      values: filterState.selectedSalaryFrom,
+      setValues: filterState.setSelectedSalaryFrom,
+      format: (val: string) => `$ ${val}`,
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
   ]
