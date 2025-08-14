@@ -1,7 +1,11 @@
+// hooks/useJobFilters.ts
 import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
-import { toTitleCase, currencyFormatter } from '../utils'
+import { toTitleCase } from '../utilities/utils'
 
+/* ────────────────────────────────────────────────────────────────
+   Static groupings / constants
+   ──────────────────────────────────────────────────────────────── */
 const NON_EXAM_TITLE_CLASSIFICATION = [
   'Pending Classification-2',
   'Labor-3',
@@ -17,141 +21,199 @@ const DATE_BUCKETS = [
   { value: '6m', label: 'Past 6 months', days: 183 },
 ]
 
+/* ────────────────────────────────────────────────────────────────
+   Salary bucketing helpers (for options + predicate)
+   - Produce a stable key for filtering and a friendly label for UI.
+   ──────────────────────────────────────────────────────────────── */
+const toK = (n: number) => `${Math.round(n / 1000)}k`
+
+const fmtAnnual = (min: number, max?: number) =>
+  max == null ? `$${toK(min)}+ per year` : `$${toK(min)}–$${toK(max)} per year`
+
+const fmtHourly = (min: number, max?: number) =>
+  max == null ? `$${min}+ per hour` : `$${min}–$${max} per hour`
+
+const fmtDaily = (min: number, max?: number) =>
+  max == null ? `$${min}+ per day` : `$${min}–$${max} per day`
+
+/**
+ * Bucket a raw salary+frequency into a stable key and human label.
+ * Keys look like: "annual:60000-80000", "annual:200000-up",
+ *                 "hourly:20-25", "daily:1000-up", etc.
+ */
+function bucketizeSalary(
+  amount: number,
+  freq: string
+): { key: string; label: string } {
+  const f = freq.toLowerCase()
+
+  if (f === 'annual') {
+    const STEP = 20000
+    const CAP = 200000
+    const min = Math.floor(amount / STEP) * STEP
+    if (amount >= CAP) return { key: `annual:${CAP}-up`, label: fmtAnnual(CAP) }
+    const max = min + STEP
+    return { key: `annual:${min}-${max}`, label: fmtAnnual(min, max) }
+  }
+
+  if (f === 'hourly') {
+    const STEP = 5
+    const CAP = 100
+    const min = Math.floor(amount / STEP) * STEP
+    if (amount >= CAP) return { key: `hourly:${CAP}-up`, label: fmtHourly(CAP) }
+    const max = min + STEP
+    return { key: `hourly:${min}-${max}`, label: fmtHourly(min, max) }
+  }
+
+  // default: treat unknown as DAILY
+  const STEP = 50
+  const CAP = 1000
+  const min = Math.floor(amount / STEP) * STEP
+  if (amount >= CAP) return { key: `daily:${CAP}-up`, label: fmtDaily(CAP) }
+  const max = min + STEP
+  return { key: `daily:${min}-${max}`, label: fmtDaily(min, max) }
+}
+
+// For sorting buckets nicely in the dropdown
+const FREQ_ORDER: Record<string, number> = { annual: 0, hourly: 1, daily: 2 }
+function parseBucketKey(key: string) {
+  // "annual:60000-80000" or "annual:200000-up"
+  const [freq, range] = key.split(':')
+  const [startStr, endStr] = range.split('-')
+  const start = Number(startStr)
+  const isUp = endStr === 'up'
+  return { freq, start, isUp }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   The hook
+   ──────────────────────────────────────────────────────────────── */
 export function useJobFilters(jobs: NYCJobType[]) {
+  // Selected values for each filter group
   const [selectedEmploymentKind, setSelectedEmploymentKind] = useState<
     string[]
   >([])
   const [selectedSalaryFrequency, setSelectedSalaryFrequency] = useState<
     string[]
   >([])
-  const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
+  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([])
   const [selectedTitleClassification, setSelectedTitleClassification] =
     useState<string[]>([])
-  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([])
   const [selectedCivilServiceTitle, setSelectedCivilServiceTitle] = useState<
     string[]
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
-  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([])
+  const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
+  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([]) // ⟵ NEW
 
   const now = Date.now()
 
-  // Deduplicate rows that share the same job_id
+  /* If you already fetch External + <=6m jobs, you can skip dedupe.
+     If not, this dedupes by job_id preferring External, then newer updated. */
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>()
-
-    jobs.forEach((j) => {
+    for (const j of jobs) {
       const existing = map.get(j.job_id)
-
       if (!existing) {
         map.set(j.job_id, j)
-      } else {
-        const jIsExternal = j.posting_type === 'External'
-        const existingIsExternal = existing.posting_type === 'External'
-
-        // Prefer external postings
-        if (jIsExternal && !existingIsExternal) {
+        continue
+      }
+      const jIsExternal = j.posting_type === 'External'
+      const eIsExternal = existing.posting_type === 'External'
+      if (jIsExternal && !eIsExternal) {
+        map.set(j.job_id, j)
+      } else if (jIsExternal === eIsExternal) {
+        if (new Date(j.posting_updated) > new Date(existing.posting_updated)) {
           map.set(j.job_id, j)
-        } else if (jIsExternal === existingIsExternal) {
-          // If both are same type, keep the most recently updated
-          const existingDate = new Date(existing.posting_updated)
-          const newDate = new Date(j.posting_updated)
-          if (newDate > existingDate) {
-            map.set(j.job_id, j)
-          }
         }
       }
-    })
-
+    }
     return Array.from(map.values())
   }, [jobs])
 
+  /* ────────────────────────────────────────────────────────────────
+     FILTER PREDICATE (uses selected values, including salary buckets)
+     ──────────────────────────────────────────────────────────────── */
   const filteredJobs = useMemo(() => {
-    const employmentKindSet = new Set(selectedEmploymentKind)
-    const salaryFrequencySet = new Set(selectedSalaryFrequency)
-    const agencySet = new Set(selectedAgencies)
-    const civilServiceTitleSet = new Set(selectedCivilServiceTitle)
-    const levelSet = new Set(selectedLevel)
-    const titleClassificationSet = new Set(selectedTitleClassification)
-    const postingAgeSet = new Set(selectedPostingAge)
-    const salaryFromSet = new Set(selectedSalaryFrom)
-
-    const dateBucketMap = DATE_BUCKETS.reduce(
-      (acc, b) => {
-        acc[b.value] = b.days
-        return acc
-      },
-      {} as Record<string, number>
-    )
-
-    return uniqueJobs.filter((job: NYCJobType) => {
+    return uniqueJobs.filter((job) => {
       if (
-        employmentKindSet.size > 0 &&
-        !employmentKindSet.has(job.full_time_part_time_indicator)
+        selectedEmploymentKind.length > 0 &&
+        !selectedEmploymentKind.includes(job.full_time_part_time_indicator)
       )
         return false
 
       if (
-        salaryFrequencySet.size > 0 &&
-        !salaryFrequencySet.has(job.salary_frequency)
+        selectedSalaryFrequency.length > 0 &&
+        !selectedSalaryFrequency.includes(job.salary_frequency)
       )
         return false
 
-      if (agencySet.size > 0 && !agencySet.has(job.agency)) return false
+      if (selectedAgencies.length > 0 && !selectedAgencies.includes(job.agency))
+        return false
 
       if (
-        civilServiceTitleSet.size > 0 &&
-        !civilServiceTitleSet.has(job.civil_service_title)
+        selectedCivilServiceTitle.length > 0 &&
+        !selectedCivilServiceTitle.includes(job.civil_service_title)
       )
         return false
 
-      if (salaryFromSet.size > 0 && !salaryFromSet.has(job.salary_range_from))
+      if (selectedLevel.length > 0 && !selectedLevel.includes(job.level))
         return false
 
-      if (levelSet.size > 0 && !levelSet.has(job.level)) return false
-
       if (
-        titleClassificationSet.size > 0 &&
+        selectedTitleClassification.length > 0 &&
         !(
-          titleClassificationSet.has(job.title_classification) ||
-          (titleClassificationSet.has('no-exam') &&
+          selectedTitleClassification.includes(job.title_classification) ||
+          (selectedTitleClassification.includes('no-exam') &&
             NON_EXAM_TITLE_CLASSIFICATION.includes(job.title_classification))
         )
       )
         return false
 
-      if (postingAgeSet.size > 0) {
+      // Posting age (cumulative buckets)
+      if (selectedPostingAge.length > 0) {
         const postingDate = new Date(job.posting_date)
         const ageInDays = (now - postingDate.getTime()) / (1000 * 60 * 60 * 24)
-
-        const matches = Array.from(postingAgeSet).some((bucket) => {
-          const days = dateBucketMap[bucket]
-          return days ? ageInDays <= days : false
+        const matches = selectedPostingAge.some((bucket) => {
+          const days = DATE_BUCKETS.find((b) => b.value === bucket)?.days
+          if (!days) return false
+          return ageInDays <= days
         })
-
         if (!matches) return false
+      }
+
+      // ⟵ NEW: Salary "from" buckets using bucketizeSalary
+      if (selectedSalaryFrom.length > 0) {
+        const amount = Number(job.salary_range_from)
+        const freq = job.salary_frequency
+        if (!Number.isFinite(amount) || !freq) return false
+        const { key } = bucketizeSalary(amount, freq)
+        if (!selectedSalaryFrom.includes(key)) return false
       }
 
       return true
     })
   }, [
+    uniqueJobs,
+    now,
     selectedEmploymentKind,
     selectedSalaryFrequency,
     selectedAgencies,
     selectedCivilServiceTitle,
     selectedLevel,
-    selectedPostingAge,
     selectedTitleClassification,
-    selectedSalaryFrom,
-    now,
-    uniqueJobs,
+    selectedPostingAge,
+    selectedSalaryFrom, // ⟵ include new dependency
   ])
 
+  /* ────────────────────────────────────────────────────────────────
+     OPTION LISTS (counts built from uniqueJobs)
+     ──────────────────────────────────────────────────────────────── */
   const employmentKindOptions = useMemo(() => {
     const map: Record<string, number> = {}
     uniqueJobs.forEach((job) => {
-      map[job.full_time_part_time_indicator] =
-        (map[job.full_time_part_time_indicator] || 0) + 1
+      const k = job.full_time_part_time_indicator
+      map[k] = (map[k] || 0) + 1
     })
     return [
       { value: 'F', label: 'Full-Time', count: map['F'] || 0 },
@@ -176,24 +238,13 @@ export function useJobFilters(jobs: NYCJobType[]) {
   const salaryFrequencyOptions = useMemo(() => {
     const map: Record<string, number> = {}
     uniqueJobs.forEach((job) => {
-      map[job.salary_frequency] = (map[job.salary_frequency] || 0) + 1
+      const k = job.salary_frequency
+      map[k] = (map[k] || 0) + 1
     })
     return ['Annual', 'Hourly', 'Daily'].map((freq) => ({
       value: freq,
       label: freq,
       count: map[freq] || 0,
-    }))
-  }, [uniqueJobs])
-
-  const postingTypeOptions = useMemo(() => {
-    const map: Record<string, number> = {}
-    uniqueJobs.forEach((job) => {
-      map[job.posting_type] = (map[job.posting_type] || 0) + 1
-    })
-    return ['Internal', 'External'].map((pt) => ({
-      value: pt,
-      label: pt,
-      count: map[pt] || 0,
     }))
   }, [uniqueJobs])
 
@@ -227,26 +278,6 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
-  const salaryFromOptions = useMemo(() => {
-    // Count occurrences keyed by the numeric starting salary
-    const counts = new Map<number, number>()
-
-    for (const job of uniqueJobs) {
-      const amount = Number(job.salary_range_from)
-      if (!Number.isFinite(amount) || amount <= 0) continue
-      counts.set(amount, (counts.get(amount) ?? 0) + 1)
-    }
-
-    // Sort numerically (low → high), then map to { value, label, count }
-    return Array.from(counts.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([amount, count]) => ({
-        value: String(amount), // raw value for filtering
-        label: currencyFormatter(amount), // pretty label, e.g. "$75,000"
-        count,
-      }))
-  }, [uniqueJobs])
-
   const levelOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     uniqueJobs.forEach((job) => {
@@ -261,6 +292,39 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
+  // ⟵ NEW: Salary "from" options (bucketed)
+  const salaryFromOptions = useMemo(() => {
+    const counts = new Map<string, number>()
+    const labels = new Map<string, string>()
+
+    for (const job of uniqueJobs) {
+      const amount = Number(job.salary_range_from)
+      const freq = job.salary_frequency
+      if (!Number.isFinite(amount) || amount <= 0 || !freq) continue
+
+      const { key, label } = bucketizeSalary(amount, freq)
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+      if (!labels.has(key)) labels.set(key, label)
+    }
+
+    // Sort by frequency group then numeric start of range
+    return Array.from(counts.entries())
+      .sort(([ka], [kb]) => {
+        const A = parseBucketKey(ka)
+        const B = parseBucketKey(kb)
+        const aOrder = FREQ_ORDER[A.freq] ?? 99
+        const bOrder = FREQ_ORDER[B.freq] ?? 99
+        if (aOrder !== bOrder) return aOrder - bOrder
+        return A.start - B.start
+      })
+      .map(([key, count]) => ({
+        value: key, // used in selectedSalaryFrom
+        label: labels.get(key)!, // human readable (e.g. "$60k–$80k per year")
+        count,
+      }))
+  }, [uniqueJobs])
+
+  // Posting age options (cumulative)
   const postingAgeOptions = useMemo(() => {
     const counts: Record<string, number> = {
       '1w': 0,
@@ -269,18 +333,15 @@ export function useJobFilters(jobs: NYCJobType[]) {
       '1m': 0,
       '6m': 0,
     }
-
     uniqueJobs.forEach((job) => {
       const date = new Date(job.posting_date)
       const ageInDays = (now - date.getTime()) / (1000 * 60 * 60 * 24)
-
       if (ageInDays <= 7) counts['1w']++
       if (ageInDays <= 14) counts['2w']++
       if (ageInDays <= 21) counts['3w']++
       if (ageInDays <= 30) counts['1m']++
       if (ageInDays <= 183) counts['6m']++
     })
-
     return DATE_BUCKETS.map(({ value, label }) => ({
       value,
       label,
@@ -288,9 +349,12 @@ export function useJobFilters(jobs: NYCJobType[]) {
     }))
   }, [uniqueJobs, now])
 
+  /* ────────────────────────────────────────────────────────────────
+     Return filtered list, selected state setters, and options
+     ──────────────────────────────────────────────────────────────── */
   return {
     filteredJobs,
-    jobs,
+    uniqueJobs,
     filterState: {
       selectedEmploymentKind,
       setSelectedEmploymentKind,
@@ -306,19 +370,18 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedLevel,
       selectedPostingAge,
       setSelectedPostingAge,
-      selectedSalaryFrom,
-      setSelectedSalaryFrom,
+      selectedSalaryFrom, // ⟵ expose new state
+      setSelectedSalaryFrom, // ⟵ expose setter
     },
     filterOptions: {
       employmentKindOptions,
       salaryFrequencyOptions,
       agencyFilterOptions,
-      postingTypeOptions,
       examTitleClassificationOptions,
       civilServiceTitleOptions,
       levelOptions,
       postingAgeOptions,
-      salaryFromOptions,
+      salaryFromOptions, // ⟵ expose options
     },
   }
 }

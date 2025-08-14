@@ -1,4 +1,4 @@
-import type { NYCJobType } from './types'
+import type { NYCJobType } from '../types'
 
 export function toTitleCase(input: string) {
   return input
