@@ -34,7 +34,7 @@ const DATE_BUCKETS = [
  */
 function bucketizeSalary(
   amount: number,
-  freq: string
+  freq: 'annual' | 'monthly' | 'daily'
 ): { key: string; label: string } {
   const f = freq.toLowerCase()
 
@@ -43,11 +43,14 @@ function bucketizeSalary(
     const CAP = 200000
     const min = Math.floor(amount / STEP) * STEP
     if (amount >= CAP)
-      return { key: `annual:${CAP}-up`, label: formatAnnualLabel(CAP) }
+      return {
+        key: `annual:${CAP}-up`,
+        label: formatAnnualLabel(CAP),
+      }
     const max = min + STEP
     return {
       // key value shows up as filter pill value in FilterResultsBar
-      key: `annual: ${toK(min)} - ${toK(max)}`,
+      key: `annual: ${min} - ${max}`,
       label: formatAnnualLabel(min, max),
     }
   }
@@ -57,9 +60,15 @@ function bucketizeSalary(
     const CAP = 100
     const min = Math.floor(amount / STEP) * STEP
     if (amount >= CAP)
-      return { key: `hourly:${CAP}-up`, label: formatHourlyLabel(CAP) }
+      return {
+        key: `hourly:${CAP}-up`,
+        label: formatHourlyLabel(CAP),
+      }
     const max = min + STEP
-    return { key: `hourly:${min}-${max}`, label: formatHourlyLabel(min, max) }
+    return {
+      key: `hourly:${min}-${max}`,
+      label: formatHourlyLabel(min, max),
+    }
   }
 
   // default: treat unknown as DAILY

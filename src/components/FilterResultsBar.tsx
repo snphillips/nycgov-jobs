@@ -32,8 +32,8 @@ export function FilterResultsBar({
   showHiddenJobs,
   onShowAllJobs,
 }: FilterResultsBarProps) {
-  // Map raw filter values to user-friendly labels
-  const labelMap: Record<string, string> = {
+  // Map raw filter values to user-friendly filterPillLabels
+  const filterPillLabelMap: Record<string, string> = {
     F: 'full time',
     P: 'part time',
     Annual: 'annual salary',
@@ -54,28 +54,28 @@ export function FilterResultsBar({
       category: 'employment',
       values: filterState.selectedEmploymentKind,
       setValues: filterState.setSelectedEmploymentKind,
-      format: (value: string) => labelMap[value] || value,
+      format: (value: string) => filterPillLabelMap[value] || value,
       filterPillColor: 'bg-blue-100 text-blue-800',
     },
     {
       category: 'salaryFrequency',
       values: filterState.selectedSalaryFrequency,
       setValues: filterState.setSelectedSalaryFrequency,
-      format: (value: string) => labelMap[value] || value,
+      format: (value: string) => filterPillLabelMap[value] || value,
       filterPillColor: 'bg-indigo-100 text-indigo-800',
     },
     {
       category: 'classification',
       values: filterState.selectedTitleClassification,
       setValues: filterState.setSelectedTitleClassification,
-      format: (value: string) => labelMap[value] || value,
+      format: (value: string) => filterPillLabelMap[value] || value,
       filterPillColor: 'bg-purple-100 text-purple-800',
     },
     {
       category: 'postingAge',
       values: filterState.selectedPostingAge,
       setValues: filterState.setSelectedPostingAge,
-      format: (value: string) => labelMap[value] || value,
+      format: (value: string) => filterPillLabelMap[value] || value,
       filterPillColor: 'bg-yellow-100 text-yellow-800',
     },
     {
@@ -116,7 +116,7 @@ export function FilterResultsBar({
       : filterConfigs.flatMap(
           ({ values, setValues, format, filterPillColor }) =>
             values.map((value) => ({
-              label: format(value),
+              filterPillLabel: format(value),
               onRemove: () => setValues(values.filter((v) => v !== value)),
               filterPillColor,
             }))
@@ -156,28 +156,30 @@ export function FilterResultsBar({
           type="button"
           onClick={onShowAllJobs}
           className="ml-2 px-3 py-1 rounded-full bg-stone-200 text-stone-800 text-xs font-medium hover:bg-stone-300"
-          aria-label="Back to all jobs"
+          aria-filterPillLabel="Back to all jobs"
         >
           ← Back to all jobs
         </button>
       )}
 
       {/* Pills only when showing regular filter results (not faves or hidden) */}
-      {filterPills.map(({ label, onRemove, filterPillColor }, index) => (
-        <span
-          key={`${label}-${index}`}
-          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${filterPillColor}`}
-        >
-          {label}
-          <button
-            onClick={onRemove}
-            className="ml-1 text-xs hover:text-black"
-            aria-label={`remove ${label} filter`}
+      {filterPills.map(
+        ({ filterPillLabel, onRemove, filterPillColor }, index) => (
+          <span
+            key={`${filterPillLabel}-${index}`}
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${filterPillColor}`}
           >
-            ×
-          </button>
-        </span>
-      ))}
+            {filterPillLabel}
+            <button
+              onClick={onRemove}
+              className="ml-1 text-xs hover:text-black"
+              aria-label={`remove ${filterPillLabel} filter`}
+            >
+              ×
+            </button>
+          </span>
+        )
+      )}
 
       {/* Clear-all only in regular filter mode and when there are pills */}
       {filterPills.length > 0 && !showFavoriteJobs && !showHiddenJobs && (
