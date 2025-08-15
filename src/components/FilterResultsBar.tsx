@@ -54,61 +54,62 @@ export function FilterResultsBar({
       category: 'employment',
       values: filterState.selectedEmploymentKind,
       setValues: filterState.setSelectedEmploymentKind,
-      format: (val: string) => labelMap[val] || val,
+      format: (value: string) => labelMap[value] || value,
       filterPillColor: 'bg-blue-100 text-blue-800',
     },
     {
       category: 'salaryFrequency',
       values: filterState.selectedSalaryFrequency,
       setValues: filterState.setSelectedSalaryFrequency,
-      format: (val: string) => labelMap[val] || val,
-      filterPillColor: 'bg-green-100 text-green-800',
+      format: (value: string) => labelMap[value] || value,
+      filterPillColor: 'bg-indigo-100 text-indigo-800',
     },
     {
       category: 'classification',
       values: filterState.selectedTitleClassification,
       setValues: filterState.setSelectedTitleClassification,
-      format: (val: string) => labelMap[val] || val,
+      format: (value: string) => labelMap[value] || value,
       filterPillColor: 'bg-purple-100 text-purple-800',
     },
     {
       category: 'postingAge',
       values: filterState.selectedPostingAge,
       setValues: filterState.setSelectedPostingAge,
-      format: (val: string) => labelMap[val] || val,
+      format: (value: string) => labelMap[value] || value,
       filterPillColor: 'bg-yellow-100 text-yellow-800',
     },
     {
       category: 'agency',
       values: filterState.selectedAgencies,
       setValues: filterState.setSelectedAgencies,
-      format: (val: string) => val.toLowerCase(),
+      format: (value: string) => value.toLowerCase(),
       filterPillColor: 'bg-lime-100 text-lime-800',
     },
     {
       category: 'civilService',
       values: filterState.selectedCivilServiceTitle,
       setValues: filterState.setSelectedCivilServiceTitle,
-      format: (val: string) => val.toLowerCase(),
+      format: (value: string) => value.toLowerCase(),
       filterPillColor: 'bg-orange-100 text-orange-800',
     },
     {
       category: 'level',
       values: filterState.selectedLevel,
       setValues: filterState.setSelectedLevel,
-      format: (val: string) => `level ${val.toLowerCase()}`,
+      format: (value: string) => `level ${value.toLowerCase()}`,
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
     {
       category: 'salaryRangeFrom',
       values: filterState.selectedSalaryFrom,
       setValues: filterState.setSelectedSalaryFrom,
-      format: (val: string) => `$ ${val}`,
-      filterPillColor: 'bg-sky-100 text-sky-800',
+      format: (value: string) => `$ ${value}`,
+      filterPillColor: 'bg-green-100 text-green-800',
     },
   ]
 
   // Flatten into pill models (only used in normal mode)
+  //
   const filterPills =
     showFavoriteJobs || showHiddenJobs
       ? []
@@ -161,7 +162,7 @@ export function FilterResultsBar({
         </button>
       )}
 
-      {/* Pills only when showing regular filter results */}
+      {/* Pills only when showing regular filter results (not faves or hidden) */}
       {filterPills.map(({ label, onRemove, filterPillColor }, index) => (
         <span
           key={`${label}-${index}`}

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import type { NYCJobType } from '../types'
-import { cleanText, formatSalaryRangeFrequency } from '../utilities/utils.ts'
+import { cleanText, formatSalaryRangeFrequency } from '../utils.ts'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { EyeSlashIcon } from '@heroicons/react/24/solid'
 

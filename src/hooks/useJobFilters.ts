@@ -1,7 +1,13 @@
 // hooks/useJobFilters.ts
 import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
-import { toTitleCase } from '../utilities/utils'
+import {
+  toK,
+  formatDailyLabel,
+  formatAnnualLabel,
+  formatHourlyLabel,
+  toTitleCase,
+} from '../utils'
 
 /* ────────────────────────────────────────────────────────────────
    Static groupings / constants
@@ -21,21 +27,6 @@ const DATE_BUCKETS = [
   { value: '6m', label: 'Past 6 months', days: 183 },
 ]
 
-/* ────────────────────────────────────────────────────────────────
-   Salary bucketing helpers (for options + predicate)
-   - Produce a stable key for filtering and a friendly label for UI.
-   ──────────────────────────────────────────────────────────────── */
-const toK = (n: number) => `${Math.round(n / 1000)}k`
-
-const fmtAnnual = (min: number, max?: number) =>
-  max == null ? `$${toK(min)}+ per year` : `$${toK(min)}–$${toK(max)} per year`
-
-const fmtHourly = (min: number, max?: number) =>
-  max == null ? `$${min}+ per hour` : `$${min}–$${max} per hour`
-
-const fmtDaily = (min: number, max?: number) =>
-  max == null ? `$${min}+ per day` : `$${min}–$${max} per day`
-
 /**
  * Bucket a raw salary+frequency into a stable key and human label.
  * Keys look like: "annual:60000-80000", "annual:200000-up",
@@ -48,30 +39,37 @@ function bucketizeSalary(
   const f = freq.toLowerCase()
 
   if (f === 'annual') {
-    const STEP = 20000
+    const STEP = 25000
     const CAP = 200000
     const min = Math.floor(amount / STEP) * STEP
-    if (amount >= CAP) return { key: `annual:${CAP}-up`, label: fmtAnnual(CAP) }
+    if (amount >= CAP)
+      return { key: `annual:${CAP}-up`, label: formatAnnualLabel(CAP) }
     const max = min + STEP
-    return { key: `annual:${min}-${max}`, label: fmtAnnual(min, max) }
+    return {
+      // key value shows up as filter pill value in FilterResultsBar
+      key: `annual: ${toK(min)} - ${toK(max)}`,
+      label: formatAnnualLabel(min, max),
+    }
   }
 
   if (f === 'hourly') {
-    const STEP = 5
+    const STEP = 20
     const CAP = 100
     const min = Math.floor(amount / STEP) * STEP
-    if (amount >= CAP) return { key: `hourly:${CAP}-up`, label: fmtHourly(CAP) }
+    if (amount >= CAP)
+      return { key: `hourly:${CAP}-up`, label: formatHourlyLabel(CAP) }
     const max = min + STEP
-    return { key: `hourly:${min}-${max}`, label: fmtHourly(min, max) }
+    return { key: `hourly:${min}-${max}`, label: formatHourlyLabel(min, max) }
   }
 
   // default: treat unknown as DAILY
-  const STEP = 50
+  const STEP = 200
   const CAP = 1000
   const min = Math.floor(amount / STEP) * STEP
-  if (amount >= CAP) return { key: `daily:${CAP}-up`, label: fmtDaily(CAP) }
+  if (amount >= CAP)
+    return { key: `daily:${CAP}-up`, label: formatDailyLabel(CAP) }
   const max = min + STEP
-  return { key: `daily:${min}-${max}`, label: fmtDaily(min, max) }
+  return { key: `daily:${min}-${max}`, label: formatDailyLabel(min, max) }
 }
 
 // For sorting buckets nicely in the dropdown
@@ -292,7 +290,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
-  // ⟵ NEW: Salary "from" options (bucketed)
+  // Salary "from" options (bucketed)
   const salaryFromOptions = useMemo(() => {
     const counts = new Map<string, number>()
     const labels = new Map<string, string>()
@@ -349,9 +347,6 @@ export function useJobFilters(jobs: NYCJobType[]) {
     }))
   }, [uniqueJobs, now])
 
-  /* ────────────────────────────────────────────────────────────────
-     Return filtered list, selected state setters, and options
-     ──────────────────────────────────────────────────────────────── */
   return {
     filteredJobs,
     uniqueJobs,
@@ -370,8 +365,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedLevel,
       selectedPostingAge,
       setSelectedPostingAge,
-      selectedSalaryFrom, // ⟵ expose new state
-      setSelectedSalaryFrom, // ⟵ expose setter
+      selectedSalaryFrom,
+      setSelectedSalaryFrom,
     },
     filterOptions: {
       employmentKindOptions,
@@ -381,7 +376,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       civilServiceTitleOptions,
       levelOptions,
       postingAgeOptions,
-      salaryFromOptions, // ⟵ expose options
+      salaryFromOptions,
     },
   }
 }
