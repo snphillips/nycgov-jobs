@@ -6,15 +6,17 @@ const RETRIEVAL_LIMIT = 1500
 
 export async function fetchJobs(
   offset = 0,
-  limit = RETRIEVAL_LIMIT
+  limit = RETRIEVAL_LIMIT,
+  signal?: AbortSignal
 ): Promise<NYCJobType[]> {
   const url = new URL(ENDPOINT)
   url.searchParams.set('$limit', String(limit))
   url.searchParams.set('$offset', String(offset))
-  url.searchParams.set('$order', 'posting_date DESC') // example sort
+  url.searchParams.set('$order', 'posting_date DESC')
 
   const res = await fetch(url.toString(), {
     headers: { 'X-App-Token': APP_TOKEN },
+    signal,
   })
 
   if (!res.ok) throw new Error(`NYC Jobs API ${res.status}`)
