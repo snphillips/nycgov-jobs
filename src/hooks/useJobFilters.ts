@@ -1,16 +1,39 @@
 import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
 import {
-  // toK,
   formatDailyLabel,
   formatAnnualLabel,
   formatHourlyLabel,
   toTitleCase,
 } from '../utils'
 
+/**
+ * useJobFilters
+ *
+ * This hook is the brain of the job filtering system. It takes the raw list
+ * of jobs fetched from the NYC API and returns:
+ *
+ *   1. `filteredJobs`  — the jobs that match ALL currently selected filters
+ *   2. `filterState`   — the selected values for each filter + their setters
+ *   3. `filterOptions` — the available choices for each filter dropdown,
+ *                        with job counts so the UI can show e.g. "Full-Time (142)"
+ *
+ * Filters are AND-ed together (a job must pass every active filter to appear).
+ * Within a single filter, selections are OR-ed (selecting "Annual" and "Hourly"
+ * shows jobs that are either annual OR hourly).
+ *
+ * Salary ranges are "bucketed" — instead of showing every possible salary,
+ * jobs are grouped into ranges like "$60k–$80k/yr" for a cleaner UI.
+ *
+ * Junior Dev note: most of the logic lives inside `useMemo` blocks. This means
+ * the expensive filtering/counting only re-runs when its inputs actually change,
+ * not on every render.
+ */
+
 /* ────────────────────────────────────────────────────────────────
-   Static groupings / constants
+   Constants
    ──────────────────────────────────────────────────────────────── */
+
 const NON_EXAM_TITLE_CLASSIFICATION = [
   'Pending Classification-2',
   'Labor-3',
@@ -26,51 +49,54 @@ const DATE_BUCKETS = [
   { value: '6m', label: 'Past 6 months', days: 183 },
 ]
 
+// Used to sort salary buckets: annual first, then hourly, then daily
+const FREQ_ORDER: Record<string, number> = { annual: 0, hourly: 1, daily: 2 }
+
+// Valid salary frequency values from the API
+const VALID_FREQS = ['annual', 'hourly', 'daily'] as const
+type SalaryFreq = (typeof VALID_FREQS)[number]
+
+function isValidFreq(f: string): f is SalaryFreq {
+  return (VALID_FREQS as readonly string[]).includes(f)
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Salary bucketing helpers
+   ──────────────────────────────────────────────────────────────── */
+
 /**
- * Bucket a raw salary+frequency into a stable key and human label.
- * Keys look like: "annual:60000-80000", "annual:200000-up",
- *                 "hourly:20-25", "daily:1000-up", etc.
+ * Takes a raw salary amount + frequency and returns a stable bucket key
+ * and a human-readable label. For example:
+ *   bucketizeSalary(72000, 'annual') → { key: 'annual:60000-80000', label: '$60k–$80k/yr' }
+ *
+ * The key is used internally to match filter selections.
+ * The label is what the user sees in the dropdown.
  */
 function bucketizeSalary(
   amount: number,
-  freq: 'annual' | 'monthly' | 'daily'
+  freq: SalaryFreq
 ): { key: string; label: string } {
-  const f = freq.toLowerCase()
-
-  if (f === 'annual') {
+  if (freq === 'annual') {
     const STEP = 25000
-    const SALARY_CAP = 200000
+    const CAP = 200000
     const min = Math.floor(amount / STEP) * STEP
-    if (amount >= SALARY_CAP)
-      return {
-        key: `annual:${SALARY_CAP}-up`,
-        label: formatAnnualLabel(SALARY_CAP),
-      }
+    if (amount >= CAP)
+      return { key: `annual:${CAP}-up`, label: formatAnnualLabel(CAP) }
     const max = min + STEP
-    return {
-      // key value shows up as filter pill value in FilterResultsBar
-      key: `annual: ${min} - ${max}`,
-      label: formatAnnualLabel(min, max),
-    }
+    return { key: `annual:${min}-${max}`, label: formatAnnualLabel(min, max) }
   }
 
-  if (f === 'hourly') {
+  if (freq === 'hourly') {
     const STEP = 20
     const CAP = 100
     const min = Math.floor(amount / STEP) * STEP
     if (amount >= CAP)
-      return {
-        key: `hourly:${CAP}-up`,
-        label: formatHourlyLabel(CAP),
-      }
+      return { key: `hourly:${CAP}-up`, label: formatHourlyLabel(CAP) }
     const max = min + STEP
-    return {
-      key: `hourly:${min}-${max}`,
-      label: formatHourlyLabel(min, max),
-    }
+    return { key: `hourly:${min}-${max}`, label: formatHourlyLabel(min, max) }
   }
 
-  // default: treat unknown as DAILY
+  // daily
   const STEP = 200
   const CAP = 1000
   const min = Math.floor(amount / STEP) * STEP
@@ -80,22 +106,17 @@ function bucketizeSalary(
   return { key: `daily:${min}-${max}`, label: formatDailyLabel(min, max) }
 }
 
-// For sorting buckets nicely in the dropdown
-const FREQ_ORDER: Record<string, number> = { annual: 0, hourly: 1, daily: 2 }
+/** Parses "annual:60000-80000" into { freq: 'annual', start: 60000, isUp: false } */
 function parseBucketKey(key: string) {
-  // "annual:60000-80000" or "annual:200000-up"
   const [freq, range] = key.split(':')
   const [startStr, endStr] = range.split('-')
-  const start = Number(startStr)
-  const isUp = endStr === 'up'
-  return { freq, start, isUp }
+  return { freq, start: Number(startStr), isUp: endStr === 'up' }
 }
 
 /* ────────────────────────────────────────────────────────────────
    The hook
    ──────────────────────────────────────────────────────────────── */
 export function useJobFilters(jobs: NYCJobType[]) {
-  // Selected values for each filter group
   const [selectedEmploymentKind, setSelectedEmploymentKind] = useState<
     string[]
   >([])
@@ -110,12 +131,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
   >([])
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
   const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
-  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([]) // ⟵ NEW
+  const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([])
 
-  const now = Date.now()
-
-  /* If you already fetch External + <=6m jobs, you can skip dedupe.
-     If not, this dedupes by job_id preferring External, then newer updated. */
+  /* ── Deduplicate jobs by job_id ─────────────────────────────── */
   const uniqueJobs = useMemo(() => {
     const map = new Map<string, NYCJobType>()
     for (const j of jobs) {
@@ -129,18 +147,18 @@ export function useJobFilters(jobs: NYCJobType[]) {
       if (jIsExternal && !eIsExternal) {
         map.set(j.job_id, j)
       } else if (jIsExternal === eIsExternal) {
-        if (new Date(j.posting_updated) > new Date(existing.posting_updated)) {
+        if (new Date(j.posting_updated) > new Date(existing.posting_updated))
           map.set(j.job_id, j)
-        }
       }
     }
     return Array.from(map.values())
   }, [jobs])
 
-  /* ────────────────────────────────────────────────────────────────
-     FILTER PREDICATE (uses selected values, including salary buckets)
-     ──────────────────────────────────────────────────────────────── */
+  /* ── Apply all active filters ───────────────────────────────── */
   const filteredJobs = useMemo(() => {
+    // Snapshot now inside the memo so it doesn't invalidate on every render
+    const now = Date.now()
+
     return uniqueJobs.filter((job) => {
       if (
         selectedEmploymentKind.length > 0 &&
@@ -176,23 +194,21 @@ export function useJobFilters(jobs: NYCJobType[]) {
       )
         return false
 
-      // Posting age (cumulative buckets)
       if (selectedPostingAge.length > 0) {
-        const postingDate = new Date(job.posting_date)
-        const ageInDays = (now - postingDate.getTime()) / (1000 * 60 * 60 * 24)
+        const ageInDays =
+          (now - new Date(job.posting_date).getTime()) / (1000 * 60 * 60 * 24)
         const matches = selectedPostingAge.some((bucket) => {
           const days = DATE_BUCKETS.find((b) => b.value === bucket)?.days
-          if (!days) return false
-          return ageInDays <= days
+          return days != null && ageInDays <= days
         })
         if (!matches) return false
       }
 
-      // Salary from buckets using bucketizeSalary
       if (selectedSalaryFrom.length > 0) {
         const amount = Number(job.salary_range_from)
-        const freq = job.salary_frequency as 'annual' | 'monthly' | 'daily'
-        if (!Number.isFinite(amount) || !freq) return false
+        const freq = job.salary_frequency?.toLowerCase()
+        if (!Number.isFinite(amount) || !freq || !isValidFreq(freq))
+          return false
         const { key } = bucketizeSalary(amount, freq)
         if (!selectedSalaryFrom.includes(key)) return false
       }
@@ -201,7 +217,6 @@ export function useJobFilters(jobs: NYCJobType[]) {
     })
   }, [
     uniqueJobs,
-    now,
     selectedEmploymentKind,
     selectedSalaryFrequency,
     selectedAgencies,
@@ -209,12 +224,11 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedLevel,
     selectedTitleClassification,
     selectedPostingAge,
-    selectedSalaryFrom, // ⟵ include new dependency
+    selectedSalaryFrom,
   ])
 
-  /* ────────────────────────────────────────────────────────────────
-     OPTION LISTS (counts built from uniqueJobs)
-     ──────────────────────────────────────────────────────────────── */
+  /* ── Build filter option lists with counts ──────────────────── */
+
   const employmentKindOptions = useMemo(() => {
     const map: Record<string, number> = {}
     uniqueJobs.forEach((job) => {
@@ -277,9 +291,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
     })
     return Object.entries(counts)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([civil_service_title, count]) => ({
-        value: civil_service_title,
-        label: toTitleCase(civil_service_title),
+      .map(([title, count]) => ({
+        value: title,
+        label: toTitleCase(title),
         count,
       }))
   }, [uniqueJobs])
@@ -298,22 +312,23 @@ export function useJobFilters(jobs: NYCJobType[]) {
       }))
   }, [uniqueJobs])
 
-  // Salary "from" options (bucketed)
   const salaryFromOptions = useMemo(() => {
     const counts = new Map<string, number>()
     const labels = new Map<string, string>()
-
     for (const job of uniqueJobs) {
       const amount = Number(job.salary_range_from)
-      const freq = job.salary_frequency as 'annual' | 'monthly' | 'daily'
-      if (!Number.isFinite(amount) || amount <= 0 || !freq) continue
-
+      const freq = job.salary_frequency?.toLowerCase()
+      if (
+        !Number.isFinite(amount) ||
+        amount <= 0 ||
+        !freq ||
+        !isValidFreq(freq)
+      )
+        continue
       const { key, label } = bucketizeSalary(amount, freq)
       counts.set(key, (counts.get(key) ?? 0) + 1)
       if (!labels.has(key)) labels.set(key, label)
     }
-
-    // Sort by frequency group then numeric start of range
     return Array.from(counts.entries())
       .sort(([ka], [kb]) => {
         const A = parseBucketKey(ka)
@@ -324,14 +339,14 @@ export function useJobFilters(jobs: NYCJobType[]) {
         return A.start - B.start
       })
       .map(([key, count]) => ({
-        value: key, // used in selectedSalaryFrom
-        label: labels.get(key)!, // human readable (e.g. "$60k–$80k per year")
+        value: key,
+        label: labels.get(key)!,
         count,
       }))
   }, [uniqueJobs])
 
-  // Posting age options (cumulative)
   const postingAgeOptions = useMemo(() => {
+    const now = Date.now()
     const counts: Record<string, number> = {
       '1w': 0,
       '2w': 0,
@@ -340,8 +355,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       '6m': 0,
     }
     uniqueJobs.forEach((job) => {
-      const date = new Date(job.posting_date)
-      const ageInDays = (now - date.getTime()) / (1000 * 60 * 60 * 24)
+      const ageInDays =
+        (now - new Date(job.posting_date).getTime()) / (1000 * 60 * 60 * 24)
       if (ageInDays <= 7) counts['1w']++
       if (ageInDays <= 14) counts['2w']++
       if (ageInDays <= 21) counts['3w']++
@@ -353,7 +368,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       label,
       count: counts[value],
     }))
-  }, [uniqueJobs, now])
+  }, [uniqueJobs])
 
   return {
     filteredJobs,
