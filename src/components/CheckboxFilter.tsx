@@ -1,5 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
 
+/**
+ * CheckboxFilter
+ *
+ * A dropdown filter control with a list of checkboxes inside.
+ * Clicking the button toggles the dropdown open/closed.
+ * Users can select individual options or use "Select All" to toggle everything.
+ *
+ * The "Select All" checkbox has three states:
+ *   - Checked: all options selected
+ *   - Unchecked: no options selected
+ *   - Indeterminate (dash): some options selected — this is set via a ref
+ *     because React doesn't support the indeterminate state as a prop
+ *
+ * Junior Dev note: this component is "controlled" — it doesn't decide which
+ * options are selected. The parent passes in `selected` and an `onChange`
+ * callback, so the parent always owns the state.
+ */
+
 // Represents a single checkbox option
 export interface Option {
   value: string
@@ -26,7 +44,9 @@ function CheckboxFilter({
   // Controls whether dropdown is open
   const [isOpen, setIsOpen] = useState(false)
 
-  // Ref to the "Select All" checkbox, used for setting indeterminate state
+  // Ref to the "Select All" checkbox, used for setting indeterminate state.
+  // We use a ref here because indeterminate is a DOM property, not an HTML
+  // attribute — React has no prop for it, so we set it directly on the element.
   const selectAllRef = useRef<HTMLInputElement>(null)
 
   // List of all option values
@@ -77,7 +97,9 @@ function CheckboxFilter({
         </span>
       </button>
 
-      {/* Dropdown panel with checkbox options */}
+      {/* Dropdown panel — uses max-height + opacity animation instead of
+          conditional rendering so the open/close transition is smooth.
+          pointer-events-none prevents clicks when visually hidden. */}
       <div
         id={`${id}-dropdown`}
         className={`absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden transition-all duration-200 ${
@@ -104,7 +126,7 @@ function CheckboxFilter({
           {options.map((option) => (
             <label
               key={option.value}
-              className="flex items-center gap-2 text-sm text-gray-700 py-1"
+              className="checkbox-label flex items-center gap-2 text-sm text-gray-700 py-1"
             >
               <input
                 type="checkbox"
