@@ -11,19 +11,18 @@ import { Toaster } from 'react-hot-toast'
 
 const PAGE_SIZE = 12
 
-  function loadSet(key: string): Set<string> {
-    try {
-      const raw = localStorage.getItem(key)
-      if (!raw) return new Set()
-      const arr = JSON.parse(raw)
-      return Array.isArray(arr) ? new Set(arr) : new Set()
-    } catch {
-      return new Set()
-    }
+function loadSet(key: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(key)
+    if (!raw) return new Set()
+    const arr = JSON.parse(raw)
+    return Array.isArray(arr) ? new Set(arr) : new Set()
+  } catch {
+    return new Set()
   }
+}
 
 export default function App() {
-
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
 
@@ -38,7 +37,6 @@ export default function App() {
   const [showHiddenJobs, setShowHiddenJobs] = useState(false)
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-
 
   /* *******************************
    * FAVORITE / HIDE MUTATORS
@@ -67,8 +65,6 @@ export default function App() {
       }
       return next
     })
-
-
 
   // Debounced saves
   const favoriteJobsArray = useMemo(() => [...favoriteJobs], [favoriteJobs])
@@ -112,30 +108,30 @@ export default function App() {
       )
     }
 
-    
     // Default: show all filtered jobs except the hidden ones
     return filteredJobs.filter((job) => !hiddenJobs.has(job.job_id))
   }, [filteredJobs, favoriteJobs, hiddenJobs, showFavoriteJobs, showHiddenJobs])
-  
+
   // Apply pagination/infinite scroll slice
   const visibleJobs = displayJobs.slice(0, visibleCount)
-  
-  const handleShowAllJobs = useCallback(() => {
-window.scrollTo({ top: 0, behavior: 'smooth' })
-setShowFavoriteJobs(false)
-setShowHiddenJobs(false)
-}, [])
 
-/* *******************************
+  const handleShowAllJobs = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setShowFavoriteJobs(false)
+    setShowHiddenJobs(false)
+  }, [])
+
+  /* *******************************
    * INFINITE SCROLL OBSERVER
    * ***************************** */
   const visibleCountRef = useRef(visibleCount)
   const displayJobsLengthRef = useRef(displayJobs.length)
   const observerRef = useRef<IntersectionObserver | null>(null)
 
-  // Sync refs inline — no useEffect needed, always current before observer fires
-  visibleCountRef.current = visibleCount
-  displayJobsLengthRef.current = displayJobs.length
+  useEffect(() => {
+    visibleCountRef.current = visibleCount
+    displayJobsLengthRef.current = displayJobs.length
+  }, [visibleCount, displayJobs.length])
 
   const loaderRef = useCallback((node: HTMLDivElement | null) => {
     if (observerRef.current) {
@@ -147,7 +143,10 @@ setShowHiddenJobs(false)
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && visibleCountRef.current < displayJobsLengthRef.current) {
+        if (
+          entries[0]?.isIntersecting &&
+          visibleCountRef.current < displayJobsLengthRef.current
+        ) {
           setVisibleCount((prev) => prev + PAGE_SIZE)
         }
       },
@@ -162,7 +161,6 @@ setShowHiddenJobs(false)
    * ***************************** */
   if (loading) return <p className="p-6">Loading NYC job listings…</p>
   if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
-
 
   /* *******************************
    * RENDER
