@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNYCJobs } from './hooks/useNYCJobs'
 import { useDebouncedLocalStorage } from './hooks/useDebouncedLocalStorage'
 import { useJobFilters } from './hooks/useJobFilters'
@@ -9,8 +9,20 @@ import type { NYCJobType } from './types'
 import { HeartIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 import { Toaster } from 'react-hot-toast'
 
+const PAGE_SIZE = 12
+
+  function loadSet(key: string): Set<string> {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return new Set()
+      const arr = JSON.parse(raw)
+      return Array.isArray(arr) ? new Set(arr) : new Set()
+    } catch {
+      return new Set()
+    }
+  }
+
 export default function App() {
-  const PAGE_SIZE = 12
 
   const { jobs, loading, error } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
@@ -26,7 +38,7 @@ export default function App() {
   const [showHiddenJobs, setShowHiddenJobs] = useState(false)
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const loaderRef = useRef<HTMLDivElement | null>(null)
+
 
   /* *******************************
    * FAVORITE / HIDE MUTATORS
@@ -56,19 +68,11 @@ export default function App() {
       return next
     })
 
-  function loadSet(key: string): Set<string> {
-    try {
-      const raw = localStorage.getItem(key)
-      if (!raw) return new Set()
-      const arr = JSON.parse(raw)
-      return Array.isArray(arr) ? new Set(arr) : new Set()
-    } catch {
-      return new Set()
-    }
-  }
+
 
   // Debounced saves
-  useDebouncedLocalStorage('favoriteJobs', [...favoriteJobs])
+  const favoriteJobsArray = useMemo(() => [...favoriteJobs], [favoriteJobs])
+  useDebouncedLocalStorage('favoriteJobs', favoriteJobsArray)
   useDebouncedLocalStorage('hiddenJobs', [...hiddenJobs])
 
   /* *******************************
@@ -108,55 +112,57 @@ export default function App() {
       )
     }
 
+    
     // Default: show all filtered jobs except the hidden ones
     return filteredJobs.filter((job) => !hiddenJobs.has(job.job_id))
   }, [filteredJobs, favoriteJobs, hiddenJobs, showFavoriteJobs, showHiddenJobs])
-
+  
   // Apply pagination/infinite scroll slice
-  const visibleJobs = useMemo(
-    () => displayJobs.slice(0, visibleCount),
-    [displayJobs, visibleCount]
-  )
+  const visibleJobs = displayJobs.slice(0, visibleCount)
+  
+  const handleShowAllJobs = useCallback(() => {
+window.scrollTo({ top: 0, behavior: 'smooth' })
+setShowFavoriteJobs(false)
+setShowHiddenJobs(false)
+}, [])
 
-  /* *******************************
-   * RESET PAGINATION WHEN INPUTS CHANGE
-   * (Filters or display mode changed → start from top)
-   * ***************************** */
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [
-    PAGE_SIZE,
-    filteredJobs, // filter criteria changed
-    showFavoriteJobs, // mode changed
-    showHiddenJobs, // mode changed
-  ])
-
-  /* *******************************
+/* *******************************
    * INFINITE SCROLL OBSERVER
    * ***************************** */
-  useEffect(() => {
-    const node = loaderRef.current
+  const visibleCountRef = useRef(visibleCount)
+  const displayJobsLengthRef = useRef(displayJobs.length)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // Sync refs inline — no useEffect needed, always current before observer fires
+  visibleCountRef.current = visibleCount
+  displayJobsLengthRef.current = displayJobs.length
+
+  const loaderRef = useCallback((node: HTMLDivElement | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      observerRef.current = null
+    }
+
     if (!node) return
 
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
-        const isInView = entries[0]?.isIntersecting
-        if (isInView && visibleCount < displayJobs.length) {
+        if (entries[0]?.isIntersecting && visibleCountRef.current < displayJobsLengthRef.current) {
           setVisibleCount((prev) => prev + PAGE_SIZE)
         }
       },
-      { rootMargin: '100px' } // trigger a bit early
+      { rootMargin: '100px' }
     )
 
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [PAGE_SIZE, visibleCount, displayJobs.length])
+    observerRef.current.observe(node)
+  }, [])
 
   /* *******************************
    * LOADING / ERROR
    * ***************************** */
   if (loading) return <p className="p-6">Loading NYC job listings…</p>
   if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
+
 
   /* *******************************
    * RENDER
@@ -192,7 +198,7 @@ export default function App() {
             aria-pressed={showHiddenJobs}
             aria-label="Show hidden jobs"
             className="rounded-full p-1 hover:bg-stone-100"
-            title={showHiddenJobs ? 'Showing hidden' : 'Show hidden'}
+            title={showHiddenJobs ? 'Showing hidden jobs' : 'Show hidden jobs'}
           >
             <EyeSlashIcon
               className={`h-6 w-6 ${
@@ -213,11 +219,7 @@ export default function App() {
         filterState={filterState}
         showFavoriteJobs={showFavoriteJobs}
         showHiddenJobs={showHiddenJobs}
-        onShowAllJobs={() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-          setShowFavoriteJobs(false)
-          setShowHiddenJobs(false)
-        }}
+        onShowAllJobs={handleShowAllJobs}
       />
 
       <JobCards
