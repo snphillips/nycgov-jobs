@@ -25,6 +25,20 @@ interface FilterResultsBarProps {
   onShowAllJobs: () => void
 }
 
+/**
+ * FilterResultsBar
+ *
+ * Displays a summary bar below the filters showing:
+ *   - How many jobs match the current filters (or how many are favorited/hidden)
+ *   - A pill for each active filter the user can click to remove individually
+ *   - A "Clear all" button when multiple filters are active
+ *   - A "Back to all jobs" button when in favorites or hidden mode
+ *
+ * Junior Dev note: this component doesn't manage any filter state itself —
+ * it receives the current selections and their setters from the parent via
+ * filterState props, and calls those setters to remove individual filters.
+ */
+
 export function FilterResultsBar({
   filteredJobs,
   filterState,
@@ -32,7 +46,7 @@ export function FilterResultsBar({
   showHiddenJobs,
   onShowAllJobs,
 }: FilterResultsBarProps) {
-  // Map raw filter values to user-friendly filterPillLabels
+  // Map raw API/internal filter values to user-friendly pill labels
   const filterPillLabelMap: Record<string, string> = {
     F: 'full time',
     P: 'part time',
@@ -48,7 +62,8 @@ export function FilterResultsBar({
     '6m': 'six months',
   }
 
-  // Filter category configs (with pill colors)
+  // Filter category configs (with pill colors).
+  // To add a new filter type, add one entry here — no other changes needed.
   const filterConfigs = [
     {
       category: 'employment',
@@ -108,13 +123,15 @@ export function FilterResultsBar({
       category: 'salaryRangeFrom',
       values: filterState.selectedSalaryFrom,
       setValues: filterState.setSelectedSalaryFrom,
+      // TODO: raw bucket key (e.g. "annual:60000-80000") is shown here —
+      // ideally this would use the human-readable label from salaryFromOptions
       format: (filterPillValue: string) => `$ ${filterPillValue}`,
       filterPillColor: 'bg-green-100 text-green-800',
     },
   ]
 
-  // Flatten into pill models (only used in normal mode)
-  //
+  // Flatten into pill models (only used in normal mode).
+  // In favorites/hidden mode we suppress pills since filters aren't active.
   const filterPills =
     showFavoriteJobs || showHiddenJobs
       ? []
@@ -122,6 +139,7 @@ export function FilterResultsBar({
           ({ values, setValues, format, filterPillColor }) =>
             values.map((value) => ({
               filterPillLabel: format(value),
+              // Remove this single value from its filter group when clicked
               onRemove: () => setValues(values.filter((v) => v !== value)),
               filterPillColor,
             }))
@@ -139,6 +157,7 @@ export function FilterResultsBar({
     filterState.setSelectedSalaryFrom([])
   }
 
+  // Build the header text based on which display mode is active
   let dynamicHeaderText = `${filteredJobs.length} jobs match your criteria`
   if (showFavoriteJobs) {
     dynamicHeaderText = `Showing ${filteredJobs.length} favorite job${
@@ -156,35 +175,34 @@ export function FilterResultsBar({
         {dynamicHeaderText}
       </h2>
 
+      {/* Show a back button when in favorites or hidden mode instead of filter pills */}
       {(showFavoriteJobs || showHiddenJobs) && (
         <button
           type="button"
           onClick={onShowAllJobs}
           className="ml-2 px-3 py-1 rounded-full bg-stone-200 text-stone-800 text-xs font-medium hover:bg-stone-300"
-          aria-filterPillLabel="Back to all jobs"
+          aria-label="Back to all jobs"
         >
           ← Back to all jobs
         </button>
       )}
 
       {/* Pills only when showing regular filter results (not faves or hidden) */}
-      {filterPills.map(
-        ({ filterPillLabel, onRemove, filterPillColor }, index) => (
-          <span
-            key={`${filterPillLabel}-${index}`}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${filterPillColor}`}
+      {filterPills.map(({ filterPillLabel, onRemove, filterPillColor }) => (
+        <span
+          key={filterPillLabel}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs ${filterPillColor}`}
+        >
+          {filterPillLabel}
+          <button
+            onClick={onRemove}
+            className="ml-1 text-xs hover:text-black"
+            aria-label={`remove ${filterPillLabel} filter`}
           >
-            {filterPillLabel}
-            <button
-              onClick={onRemove}
-              className="ml-1 text-xs hover:text-black"
-              aria-label={`remove ${filterPillLabel} filter`}
-            >
-              ×
-            </button>
-          </span>
-        )
-      )}
+            ×
+          </button>
+        </span>
+      ))}
 
       {/* Clear-all only in regular filter mode and when there are pills */}
       {filterPills.length > 0 && !showFavoriteJobs && !showHiddenJobs && (
