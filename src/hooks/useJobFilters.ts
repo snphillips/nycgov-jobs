@@ -191,7 +191,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       // Salary from buckets using bucketizeSalary
       if (selectedSalaryFrom.length > 0) {
         const amount = Number(job.salary_range_from)
-        const freq = job.salary_frequency
+        const freq = job.salary_frequency as 'annual' | 'monthly' | 'daily'
         if (!Number.isFinite(amount) || !freq) return false
         const { key } = bucketizeSalary(amount, freq)
         if (!selectedSalaryFrom.includes(key)) return false
@@ -305,7 +305,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
 
     for (const job of uniqueJobs) {
       const amount = Number(job.salary_range_from)
-      const freq = job.salary_frequency
+      const freq = job.salary_frequency as 'annual' | 'monthly' | 'daily'
       if (!Number.isFinite(amount) || amount <= 0 || !freq) continue
 
       const { key, label } = bucketizeSalary(amount, freq)
