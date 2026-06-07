@@ -1,8 +1,7 @@
-// hooks/useJobFilters.ts
 import { useMemo, useState } from 'react'
 import type { NYCJobType } from '../types'
 import {
-  toK,
+  // toK,
   formatDailyLabel,
   formatAnnualLabel,
   formatHourlyLabel,
@@ -40,12 +39,12 @@ function bucketizeSalary(
 
   if (f === 'annual') {
     const STEP = 25000
-    const CAP = 200000
+    const SALARY_CAP = 200000
     const min = Math.floor(amount / STEP) * STEP
-    if (amount >= CAP)
+    if (amount >= SALARY_CAP)
       return {
-        key: `annual:${CAP}-up`,
-        label: formatAnnualLabel(CAP),
+        key: `annual:${SALARY_CAP}-up`,
+        label: formatAnnualLabel(SALARY_CAP),
       }
     const max = min + STEP
     return {
@@ -189,7 +188,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
         if (!matches) return false
       }
 
-      // ⟵ NEW: Salary "from" buckets using bucketizeSalary
+      // Salary from buckets using bucketizeSalary
       if (selectedSalaryFrom.length > 0) {
         const amount = Number(job.salary_range_from)
         const freq = job.salary_frequency

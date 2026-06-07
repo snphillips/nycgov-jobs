@@ -54,56 +54,61 @@ export function FilterResultsBar({
       category: 'employment',
       values: filterState.selectedEmploymentKind,
       setValues: filterState.setSelectedEmploymentKind,
-      format: (value: string) => filterPillLabelMap[value] || value,
+      format: (filterPillValue: string) =>
+        filterPillLabelMap[filterPillValue] || filterPillValue,
       filterPillColor: 'bg-blue-100 text-blue-800',
     },
     {
       category: 'salaryFrequency',
       values: filterState.selectedSalaryFrequency,
       setValues: filterState.setSelectedSalaryFrequency,
-      format: (value: string) => filterPillLabelMap[value] || value,
+      format: (filterPillValue: string) =>
+        filterPillLabelMap[filterPillValue] || filterPillValue,
       filterPillColor: 'bg-indigo-100 text-indigo-800',
     },
     {
       category: 'classification',
       values: filterState.selectedTitleClassification,
       setValues: filterState.setSelectedTitleClassification,
-      format: (value: string) => filterPillLabelMap[value] || value,
+      format: (filterPillValue: string) =>
+        filterPillLabelMap[filterPillValue] || filterPillValue,
       filterPillColor: 'bg-purple-100 text-purple-800',
     },
     {
       category: 'postingAge',
       values: filterState.selectedPostingAge,
       setValues: filterState.setSelectedPostingAge,
-      format: (value: string) => filterPillLabelMap[value] || value,
+      format: (filterPillValue: string) =>
+        filterPillLabelMap[filterPillValue] || filterPillValue,
       filterPillColor: 'bg-yellow-100 text-yellow-800',
     },
     {
       category: 'agency',
       values: filterState.selectedAgencies,
       setValues: filterState.setSelectedAgencies,
-      format: (value: string) => value.toLowerCase(),
+      format: (filterPillValue: string) => filterPillValue.toLowerCase(),
       filterPillColor: 'bg-lime-100 text-lime-800',
     },
     {
       category: 'civilService',
       values: filterState.selectedCivilServiceTitle,
       setValues: filterState.setSelectedCivilServiceTitle,
-      format: (value: string) => value.toLowerCase(),
+      format: (filterPillValue: string) => filterPillValue.toLowerCase(),
       filterPillColor: 'bg-orange-100 text-orange-800',
     },
     {
       category: 'level',
       values: filterState.selectedLevel,
       setValues: filterState.setSelectedLevel,
-      format: (value: string) => `level ${value.toLowerCase()}`,
+      format: (filterPillValue: string) =>
+        `level ${filterPillValue.toLowerCase()}`,
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
     {
       category: 'salaryRangeFrom',
       values: filterState.selectedSalaryFrom,
       setValues: filterState.setSelectedSalaryFrom,
-      format: (value: string) => `$ ${value}`,
+      format: (filterPillValue: string) => `$ ${filterPillValue}`,
       filterPillColor: 'bg-green-100 text-green-800',
     },
   ]

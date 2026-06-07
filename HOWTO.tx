@@ -1,0 +1,25 @@
+To start the app
+```
+npm run dev
+```
+
+To update packages
+
+npm outdated
+
+
+
+This tells you what a package expects before you install it:
+
+```
+npm info lodash@latest peerDependencies
+```
+
+This simulates the install and will surface ERESOLVE errors
+without touching anything. 
+```
+npm install @vitejs/plugin-react@latest --dry-run
+```
+
+# Install specific version
+npm install express@4.18.2
