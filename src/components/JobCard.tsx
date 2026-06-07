@@ -1,8 +1,22 @@
 import clsx from 'clsx'
 import type { NYCJobType } from '../types'
 import { cleanText, formatSalaryRangeFrequency } from '../utils.ts'
-import { HeartIcon } from '@heroicons/react/24/solid'
-import { EyeSlashIcon } from '@heroicons/react/24/solid'
+import { HeartIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
+
+/**
+ * JobCard
+ *
+ * Displays a single NYC job listing as a card. Shows key metadata (salary,
+ * location, exam requirement, etc.) along with the full job description and
+ * qualifications.
+ *
+ * The card has two action buttons — favorite and hide — which are controlled
+ * by the parent component via toggleFavorite and toggleHide callbacks.
+ *
+ * Junior Dev note: this component is "controlled" — it doesn't manage its own
+ * favorite/hidden state. The parent (App.tsx) owns that state and passes it
+ * down as props. This makes it easier to persist and share state across cards.
+ */
 
 interface JobCardProps {
   job: NYCJobType
@@ -12,18 +26,9 @@ interface JobCardProps {
   isHidden?: boolean
 }
 
-/* ───────────── Helpers ───────────── */
+// Classifications starting with 'Competitive' require a civil service exam
 const isExamRequired = (classification: string) =>
   classification.startsWith('Competitive')
-
-// const formatSalaryRangeFrequency = (from: string, to: string, freq: string) => {
-//   const f = new Intl.NumberFormat('en-US', {
-//     style: 'currency',
-//     currency: 'USD',
-//     maximumFractionDigits: 0,
-//   })
-//   return `${f.format(Number(from))} – ${f.format(Number(to))} ${freq}`
-// }
 
 function JobCard({
   job,
@@ -32,43 +37,43 @@ function JobCard({
   isFavorited = false,
   isHidden = false,
 }: JobCardProps) {
+  // 'F' and 'P' are the raw values from the NYC API — map them to readable labels
   const employmentType =
     job.full_time_part_time_indicator === 'F' ? 'Full-Time' : 'Part-Time'
 
   const examRequired = isExamRequired(job.title_classification)
   const postedDate = new Date(job.posting_date).toLocaleDateString()
 
+  // Extract handlers so onClick props don't create new functions on every render
+  const handleFavorite = () => toggleFavorite(job)
+  const handleHide = () => toggleHide(job)
+
   return (
-    <section className="w-full bg-stone-100 shadow-md rounded-lg p-4 flex flex-col gap-6 border-b h-100 overflow-scroll">
+    <section className="w-full bg-stone-100 shadow-md rounded-lg p-4 flex flex-col gap-6 border-b h-100 overflow-auto">
       <header className="card-header flex flex-col gap-1">
         <div className="title-icons-row flex flex-row justify-between">
-          {/* Left side: title */}
           <h3 className="font-semibold leading-tight text-amber-950">
             {job.business_title}
           </h3>
-          {/* Right side: icons */}
           <div>
             <button
-              className="favorite-button top-0 right-0 bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
-              onClick={() => toggleFavorite(job)}
+              className="favorite-button bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full shadow-indigo-500/50"
+              onClick={handleFavorite}
               aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
             >
-              {isFavorited ? (
-                <HeartIcon className="h-6 w-6 text-red-600" />
-              ) : (
-                <HeartIcon className="h-6 w-6" />
-              )}
+              {/* clsx applies text-red-600 only when isFavorited is true */}
+              <HeartIcon
+                className={clsx('h-6 w-6', isFavorited && 'text-red-600')}
+              />
             </button>
             <button
-              className="hide-button top-0 right-0 bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full, shadow-indigo-500/50"
-              onClick={() => toggleHide(job)}
-              aria-label={'Hide job'}
+              className="hide-button bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full shadow-indigo-500/50"
+              onClick={handleHide}
+              aria-label={isHidden ? 'Unhide job' : 'Hide job'}
             >
-              {isHidden ? (
-                <EyeSlashIcon className="h-6 w-6 text-gray-600" />
-              ) : (
-                <EyeSlashIcon className="h-6 w-6" />
-              )}
+              <EyeSlashIcon
+                className={clsx('h-6 w-6', isHidden && 'text-gray-600')}
+              />
             </button>
           </div>
         </div>
@@ -80,6 +85,7 @@ function JobCard({
           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
             {employmentType}
           </span>
+          {/* Exam badge changes color depending on whether an exam is required */}
           <span
             className={clsx(
               'px-2 py-1 rounded-full',
@@ -97,7 +103,8 @@ function JobCard({
         </div>
       </header>
 
-      {/* Details list */}
+      {/* dl = description list — semantic HTML for key/value pairs like a metadata table.
+          The CSS grid makes the <dt> labels and <dd> values line up in two columns. */}
       <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm text-gray-700">
         <dt className="font-medium">Date Posted</dt>
         <dd>{postedDate}</dd>
@@ -127,32 +134,32 @@ function JobCard({
         <dd>{job.salary_frequency}</dd>
         <dt className="font-medium">Division / Unit</dt>
         <dd>{job.division_work_unit}</dd>
-        <>
-          {job.hours_shift && (
-            <>
-              <dt className="font-medium">Hours / Shift</dt>
-              <dd>{job.hours_shift}</dd>
-            </>
-          )}
 
-          {job.work_location_1 && (
-            <>
-              <dt className="font-medium">Secondary Location</dt>
-              <dd>{job.work_location_1}</dd>
-            </>
-          )}
-        </>
+        {/* Fragments let us return paired <dt>/<dd> siblings conditionally
+            without a wrapper div, which would break the dl grid layout */}
+        {job.hours_shift && (
+          <>
+            <dt className="font-medium">Hours / Shift</dt>
+            <dd>{job.hours_shift}</dd>
+          </>
+        )}
+        {job.work_location_1 && (
+          <>
+            <dt className="font-medium">Secondary Location</dt>
+            <dd>{job.work_location_1}</dd>
+          </>
+        )}
       </dl>
 
-      {/* Job Description & Requirements */}
       <section className="space-y-3 text-sm text-gray-800">
+        {/* whitespace-pre-line preserves line breaks in the raw API text
+            without rendering the full whitespace of <pre> */}
         <div>
           <h5 className="font-medium mb-1">Residency Requirement</h5>
           <p className="whitespace-pre-line">
             {cleanText(job.residency_requirement)}
           </p>
         </div>
-
         <div>
           <h5 className="font-medium mb-1">Job Description</h5>
           <p className="whitespace-pre-line">
