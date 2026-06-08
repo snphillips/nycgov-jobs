@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import type { Option } from '../types'
 
 /**
  * CheckboxFilter
@@ -18,12 +19,13 @@ import { useState, useRef, useEffect } from 'react'
  * callback, so the parent always owns the state.
  */
 
+// TODO: delete when done porting over
 // Represents a single checkbox option
-export interface Option {
-  value: string
-  label: string
-  count?: number // Optional display count
-}
+// export interface Option {
+//   value: string
+//   label: string
+//   count?: number // Optional display count
+// }
 
 // Props expected by the CheckboxFilter component
 interface CheckboxFilterProps {

@@ -13,13 +13,12 @@ import {
   formatAnnualLabel,
   formatHourlyLabel,
 } from '../utils'
+import { type SalaryFreq, type FilterSelections } from '../types'
 import {
-  VALID_FREQS,
+  VALID_FREQUENCIES,
   NON_EXAM_TITLE_CLASSIFICATION,
   DATE_BUCKETS,
-  type SalaryFreq,
-  type FilterSelections,
-} from './jobFilterTypes'
+} from '../constants'
 
 /* ────────────────────────────────────────────────────────────────
    Salary frequency validation
@@ -31,7 +30,7 @@ import {
  * treat the value as SalaryFreq inside any `if (isValidFreq(f))` block.
  */
 export function isValidFreq(f: string): f is SalaryFreq {
-  return (VALID_FREQS as readonly string[]).includes(f)
+  return (VALID_FREQUENCIES as readonly string[]).includes(f)
 }
 
 /* ────────────────────────────────────────────────────────────────

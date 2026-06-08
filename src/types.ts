@@ -1,3 +1,11 @@
+import { VALID_FREQUENCIES } from './constants'
+
+/* ────────────────────────────────────────────────────────────────
+   Types
+   ──────────────────────────────────────────────────────────────── */
+
+export type SalaryFreq = (typeof VALID_FREQUENCIES)[number]
+
 export interface NYCJobType {
   job_id: string
   agency: string
@@ -28,4 +36,29 @@ export interface NYCJobType {
   post_until?: string
   posting_updated: string
   process_date: string
+}
+
+// Represents a single checkbox option
+export interface Option {
+  value: string
+  label: string
+  count?: number // Optional display count
+}
+
+/**
+ * Represents all active filter selections.
+ *
+ * Every field is optional so applyFilters can be called with a subset
+ * of filters — this is what enables faceted counts (counting against
+ * all filters except one).
+ */
+export interface FilterSelections {
+  selectedEmploymentKind?: string[]
+  selectedSalaryFrequency?: string[]
+  selectedAgencies?: string[]
+  selectedTitleClassification?: string[]
+  selectedCivilServiceTitle?: string[]
+  selectedLevel?: string[]
+  selectedPostingAge?: string[]
+  selectedSalaryFrom?: string[]
 }

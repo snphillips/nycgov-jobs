@@ -1,11 +1,18 @@
 import { useMemo, useState } from 'react'
-import type { NYCJobType } from '../types'
+import type { NYCJobType, SalaryFreq } from '../types'
+import type { FilterSelections } from '../types'
 import {
   formatDailyLabel,
   formatAnnualLabel,
   formatHourlyLabel,
   toTitleCase,
 } from '../utils'
+import {
+  NON_EXAM_TITLE_CLASSIFICATION,
+  DATE_BUCKETS,
+  FREQ_ORDER,
+  VALID_FREQUENCIES,
+} from '../constants'
 
 /**
  * useJobFilters
@@ -31,34 +38,8 @@ import {
  * not on every render.
  */
 
-/* ────────────────────────────────────────────────────────────────
-   Constants
-   ──────────────────────────────────────────────────────────────── */
-
-const NON_EXAM_TITLE_CLASSIFICATION = [
-  'Pending Classification-2',
-  'Labor-3',
-  'Exempt-4',
-  'Non-Competitive-5',
-]
-
-const DATE_BUCKETS = [
-  { value: '1w', label: 'Past week', days: 7 },
-  { value: '2w', label: 'Past 2 weeks', days: 14 },
-  { value: '3w', label: 'Past 3 weeks', days: 21 },
-  { value: '1m', label: 'Past month', days: 30 },
-  { value: '6m', label: 'Past 6 months', days: 183 },
-]
-
-// Used to sort salary buckets: annual first, then hourly, then daily
-const FREQ_ORDER: Record<string, number> = { annual: 0, hourly: 1, daily: 2 }
-
-// Valid salary frequency values from the API
-const VALID_FREQS = ['annual', 'hourly', 'daily'] as const
-type SalaryFreq = (typeof VALID_FREQS)[number]
-
 function isValidFreq(f: string): f is SalaryFreq {
-  return (VALID_FREQS as readonly string[]).includes(f)
+  return (VALID_FREQUENCIES as readonly string[]).includes(f)
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -115,21 +96,21 @@ function parseBucketKey(key: string) {
    Filter state type — used by applyFilters
    ──────────────────────────────────────────────────────────────── */
 
-/**
- * Represents all active filter selections.
- * Every field is optional so applyFilters can be called with
- * a subset of filters (e.g. to compute faceted counts by excluding one).
- */
-interface FilterSelections {
-  selectedEmploymentKind?: string[]
-  selectedSalaryFrequency?: string[]
-  selectedAgencies?: string[]
-  selectedTitleClassification?: string[]
-  selectedCivilServiceTitle?: string[]
-  selectedLevel?: string[]
-  selectedPostingAge?: string[]
-  selectedSalaryFrom?: string[]
-}
+// /**
+//  * Represents all active filter selections.
+//  * Every field is optional so applyFilters can be called with
+//  * a subset of filters (e.g. to compute faceted counts by excluding one).
+//  */
+// interface FilterSelections {
+//   selectedEmploymentKind?: string[]
+//   selectedSalaryFrequency?: string[]
+//   selectedAgencies?: string[]
+//   selectedTitleClassification?: string[]
+//   selectedCivilServiceTitle?: string[]
+//   selectedLevel?: string[]
+//   selectedPostingAge?: string[]
+//   selectedSalaryFrom?: string[]
+// }
 
 /* ────────────────────────────────────────────────────────────────
    Core filter function — single source of truth for all filter logic

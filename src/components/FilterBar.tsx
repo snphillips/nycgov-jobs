@@ -1,5 +1,5 @@
 import CheckboxFilter from './CheckboxFilter'
-import type { Option } from './CheckboxFilter'
+import type { Option } from '../types'
 
 /**
  * FilterBar

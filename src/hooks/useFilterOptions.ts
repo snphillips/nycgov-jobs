@@ -23,8 +23,8 @@ import {
   DATE_BUCKETS,
   FREQ_ORDER,
   NON_EXAM_TITLE_CLASSIFICATION,
-} from './jobFilterTypes'
-import type { FilterSelections } from './jobFilterTypes'
+} from '../constants'
+import type { FilterSelections } from '../types'
 import {
   applyFilters,
   bucketizeSalary,
