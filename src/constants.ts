@@ -1,7 +1,3 @@
-/* ────────────────────────────────────────────────────────────────
-   Constants
-   ──────────────────────────────────────────────────────────────── */
-
 // Title classifications that do NOT require a civil service exam
 export const NON_EXAM_TITLE_CLASSIFICATION = [
   'Pending Classification-2',
