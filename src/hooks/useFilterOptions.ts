@@ -91,6 +91,23 @@ export function useFilterOptions(
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedOmittedAgencies,
+    ]
+  )
+
+  const jobsForOmittedAgencies = useMemo(
+    () => applyFilters(uniqueJobs, { ...allSelections, selectedAgencies: [] }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      uniqueJobs,
+      allSelections.selectedEmploymentKind,
+      allSelections.selectedSalaryFrequency,
+      allSelections.selectedTitleClassification,
+      allSelections.selectedCivilServiceTitle,
+      allSelections.selectedLevel,
+      allSelections.selectedPostingAge,
+      allSelections.selectedSalaryFrom,
+      allSelections.selectedAgencies,
     ]
   )
 
@@ -208,7 +225,7 @@ export function useFilterOptions(
     }))
   }, [jobsForSalaryFrequency])
 
-  const agencyFilterOptions = useMemo(() => {
+  const agenciesFilterOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     jobsForAgencies.forEach((job) => {
       if (job.agency) counts[job.agency] = (counts[job.agency] || 0) + 1
@@ -221,6 +238,22 @@ export function useFilterOptions(
         count,
       }))
   }, [jobsForAgencies])
+  // ================================
+  // TODO: Sarah, edit this useMemo
+  const omittedAgenciesFilterOptions = useMemo(() => {
+    const counts: Record<string, number> = {}
+    jobsForOmittedAgencies.forEach((job) => {
+      if (job.agency) counts[job.agency] = (counts[job.agency] || 0) + 1
+    })
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([agency, count]) => ({
+        value: agency,
+        label: toTitleCase(agency),
+        count,
+      }))
+  }, [jobsForOmittedAgencies])
+  // ================================
 
   const examTitleClassificationOptions = useMemo(() => {
     let examCount = 0
@@ -327,7 +360,8 @@ export function useFilterOptions(
   return {
     employmentKindOptions,
     salaryFrequencyOptions,
-    agencyFilterOptions,
+    agenciesFilterOptions,
+    omittedAgenciesFilterOptions,
     examTitleClassificationOptions,
     civilServiceTitleOptions,
     levelOptions,

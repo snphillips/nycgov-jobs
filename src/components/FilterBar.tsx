@@ -29,7 +29,11 @@ interface FilterBarProps {
 
   selectedAgencies: string[]
   setSelectedAgencies: React.Dispatch<React.SetStateAction<string[]>>
-  agencyFilterOptions: Option[]
+  agenciesFilterOptions: Option[]
+
+  selectedOmittedAgencies: string[]
+  setSelectedOmittedAgencies: React.Dispatch<React.SetStateAction<string[]>>
+  omittedAgenciesFilterOptions: Option[]
 
   selectedTitleClassification: string[]
   setSelectedTitleClassification: React.Dispatch<React.SetStateAction<string[]>>
@@ -61,7 +65,10 @@ export function FilterBar({
   salaryFrequencyOptions,
   selectedAgencies,
   setSelectedAgencies,
-  agencyFilterOptions,
+  agenciesFilterOptions,
+  selectedOmittedAgencies,
+  setSelectedOmittedAgencies,
+  omittedAgenciesFilterOptions,
   selectedTitleClassification,
   setSelectedTitleClassification,
   examTitleClassificationOptions,
@@ -105,11 +112,18 @@ export function FilterBar({
           onChange={setSelectedSalaryFrequency}
         />
         <CheckboxFilter
-          id="agency"
+          id="omitted_agency"
           label="Agency"
-          options={agencyFilterOptions}
+          options={agenciesFilterOptions}
           selected={selectedAgencies}
           onChange={setSelectedAgencies}
+        />
+        <CheckboxFilter
+          id="omittedAgencies"
+          label="Exclude Agency"
+          options={omittedAgenciesFilterOptions}
+          selected={selectedOmittedAgencies}
+          onChange={setSelectedOmittedAgencies}
         />
         <CheckboxFilter
           id="civil_service_title"

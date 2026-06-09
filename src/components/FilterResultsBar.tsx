@@ -9,6 +9,8 @@ interface FilterResultsBarProps {
     setSelectedSalaryFrequency: (val: string[]) => void
     selectedAgencies: string[]
     setSelectedAgencies: (val: string[]) => void
+    selectedOmittedAgencies: string[]
+    setSelectedOmittedAgencies: (val: string[]) => void
     selectedTitleClassification: string[]
     setSelectedTitleClassification: (val: string[]) => void
     selectedCivilServiceTitle: string[]
@@ -105,6 +107,14 @@ export function FilterResultsBar({
       filterPillColor: 'bg-lime-100 text-lime-800',
     },
     {
+      category: 'omittedAgency',
+      values: filterState.selectedOmittedAgencies,
+      setValues: filterState.setSelectedOmittedAgencies,
+      format: (filterPillValue: string) =>
+        `NO ${filterPillValue.toLowerCase()}`,
+      filterPillColor: 'bg-red-200 text-black',
+    },
+    {
       category: 'civilService',
       values: filterState.selectedCivilServiceTitle,
       setValues: filterState.setSelectedCivilServiceTitle,
@@ -150,6 +160,7 @@ export function FilterResultsBar({
     filterState.setSelectedEmploymentKind([])
     filterState.setSelectedSalaryFrequency([])
     filterState.setSelectedAgencies([])
+    filterState.setSelectedOmittedAgencies([])
     filterState.setSelectedTitleClassification([])
     filterState.setSelectedCivilServiceTitle([])
     filterState.setSelectedLevel([])

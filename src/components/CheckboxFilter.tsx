@@ -14,18 +14,10 @@ import type { Option } from '../types'
  *   - Indeterminate (dash): some options selected — this is set via a ref
  *     because React doesn't support the indeterminate state as a prop
  *
- * Junior Dev note: this component is "controlled" — it doesn't decide which
+ * Dev note: this component is "controlled" — it doesn't decide which
  * options are selected. The parent passes in `selected` and an `onChange`
  * callback, so the parent always owns the state.
  */
-
-// TODO: delete when done porting over
-// Represents a single checkbox option
-// export interface Option {
-//   value: string
-//   label: string
-//   count?: number // Optional display count
-// }
 
 // Props expected by the CheckboxFilter component
 interface CheckboxFilterProps {
@@ -40,7 +32,7 @@ function CheckboxFilter({
   id,
   label,
   options,
-  selected,
+  selected = [],
   onChange,
 }: CheckboxFilterProps) {
   // Controls whether dropdown is open

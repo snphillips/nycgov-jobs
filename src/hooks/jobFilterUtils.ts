@@ -127,6 +127,7 @@ export function applyFilters(
     selectedEmploymentKind = [],
     selectedSalaryFrequency = [],
     selectedAgencies = [],
+    selectedOmittedAgencies = [],
     selectedTitleClassification = [],
     selectedCivilServiceTitle = [],
     selectedLevel = [],
@@ -148,6 +149,12 @@ export function applyFilters(
       return false
 
     if (selectedAgencies.length > 0 && !selectedAgencies.includes(job.agency))
+      return false
+    // exclude agencies
+    if (
+      selectedOmittedAgencies.length > 0 &&
+      selectedOmittedAgencies.includes(job.agency)
+    )
       return false
 
     if (

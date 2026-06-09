@@ -9,6 +9,7 @@ export type SalaryFreq = (typeof VALID_FREQUENCIES)[number]
 export interface NYCJobType {
   job_id: string
   agency: string
+  omitted_agency: string
   posting_type: string
   number_of_positions: string
   business_title: string
@@ -56,6 +57,7 @@ export interface FilterSelections {
   selectedEmploymentKind?: string[]
   selectedSalaryFrequency?: string[]
   selectedAgencies?: string[]
+  selectedOmittedAgencies?: string[]
   selectedTitleClassification?: string[]
   selectedCivilServiceTitle?: string[]
   selectedLevel?: string[]
