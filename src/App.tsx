@@ -218,6 +218,7 @@ export default function App() {
         showFavoriteJobs={showFavoriteJobs}
         showHiddenJobs={showHiddenJobs}
         onShowAllJobs={handleShowAllJobs}
+        salaryFromOptions={filterOptions.salaryFromOptions}
       />
 
       <JobCards

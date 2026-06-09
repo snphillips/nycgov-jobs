@@ -25,6 +25,7 @@ interface FilterResultsBarProps {
   showFavoriteJobs: boolean
   showHiddenJobs: boolean
   onShowAllJobs: () => void
+  salaryFromOptions: { value: string; label: string }[]
 }
 
 /**
@@ -47,6 +48,7 @@ export function FilterResultsBar({
   showFavoriteJobs,
   showHiddenJobs,
   onShowAllJobs,
+  salaryFromOptions,
 }: FilterResultsBarProps) {
   // Map raw API/internal filter values to user-friendly pill labels
   const filterPillLabelMap: Record<string, string> = {
@@ -129,13 +131,21 @@ export function FilterResultsBar({
         `level ${filterPillValue.toLowerCase()}`,
       filterPillColor: 'bg-sky-100 text-sky-800',
     },
+    // {
+    //   category: 'salaryRangeFrom',
+    //   values: filterState.selectedSalaryFrom,
+    //   setValues: filterState.setSelectedSalaryFrom,
+    //   // TODO: raw bucket key (e.g. "annual:60000-80000") is shown here —
+    //   // ideally this would use the human-readable label from salaryFromOptions
+    //   format: (filterPillValue: string) => `$ ${filterPillValue}`,
+    //   filterPillColor: 'bg-green-100 text-green-800',
+    // },
     {
       category: 'salaryRangeFrom',
       values: filterState.selectedSalaryFrom,
       setValues: filterState.setSelectedSalaryFrom,
-      // TODO: raw bucket key (e.g. "annual:60000-80000") is shown here —
-      // ideally this would use the human-readable label from salaryFromOptions
-      format: (filterPillValue: string) => `$ ${filterPillValue}`,
+      format: (value: string) =>
+        salaryFromOptions.find((o) => o.value === value)?.label ?? value,
       filterPillColor: 'bg-green-100 text-green-800',
     },
   ]
