@@ -91,6 +91,13 @@ export function FilterBar({
       {/* Responsive grid: 1 column on mobile, 3 on medium screens, 4 on large */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
         <CheckboxFilter
+          id="postingAge"
+          label="Date Posted Within"
+          options={postingAgeOptions}
+          selected={selectedPostingAge}
+          onChange={setSelectedPostingAge}
+        />
+        <CheckboxFilter
           id="title_classification"
           label="Exam Required"
           options={examTitleClassificationOptions}
@@ -138,13 +145,6 @@ export function FilterBar({
           options={levelOptions}
           selected={selectedLevel}
           onChange={setSelectedLevel}
-        />
-        <CheckboxFilter
-          id="postingAge"
-          label="Date Posted Within"
-          options={postingAgeOptions}
-          selected={selectedPostingAge}
-          onChange={setSelectedPostingAge}
         />
         <CheckboxFilter
           id="salaryFrom"

@@ -166,7 +166,7 @@ export default function App() {
    * RENDER
    * ***************************** */
   return (
-    <>
+    <div id="app">
       <Toaster position="top-center" />
       <header className="flex items-center justify-between">
         <h1 className="p-6">nyc gov job search</h1>
@@ -180,7 +180,9 @@ export default function App() {
             aria-pressed={showFavoriteJobs}
             aria-label="Show favorited jobs"
             className="rounded-full p-1 hover:bg-stone-100"
-            title={showFavoriteJobs ? 'Showing favorites' : 'Show favorites'}
+            title={
+              showFavoriteJobs ? 'Showing favorite jobs' : 'Show favorite jobs'
+            }
           >
             <HeartIcon
               className={`h-6 w-6 ${
@@ -231,6 +233,6 @@ export default function App() {
 
       {/* Infinite scroll */}
       <div ref={loaderRef} className="h-10" />
-    </>
+    </div>
   )
 }
