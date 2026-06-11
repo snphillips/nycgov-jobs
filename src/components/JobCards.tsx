@@ -1,11 +1,11 @@
 import JobCard from './JobCard'
 import type { NYCJobType } from '../types'
 
-import noResultsImg01 from '../assets/no-results-01.png'
-import noResultsImg02 from '../assets/no-results-02.png'
-import noResultsImg03 from '../assets/no-results-03.png'
-import noResultsImg04 from '../assets/no-results-04.png'
-import noResultsImg05 from '../assets/no-results-05.png'
+import noResultsImg01 from '../assets/no-results-01.webp'
+import noResultsImg02 from '../assets/no-results-02.webp'
+import noResultsImg03 from '../assets/no-results-03.webp'
+import noResultsImg04 from '../assets/no-results-04.webp'
+import noResultsImg05 from '../assets/no-results-05.webp'
 
 const NO_RESULTS_IMAGES = [
   {
