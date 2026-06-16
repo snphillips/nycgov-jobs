@@ -23,19 +23,16 @@ function loadSet(key: string): Set<string> {
 }
 
 export default function App() {
-  const { jobs, loading, error } = useNYCJobs()
+  const { jobs, loading, error, datasetDate } = useNYCJobs()
   const { filteredJobs, filterState, filterOptions } = useJobFilters(jobs)
-
   const [favoriteJobs, setFavoriteJobs] = useState<Set<string>>(() =>
     loadSet('favoriteJobs')
   )
   const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(() =>
     loadSet('hiddenJobs')
   )
-
   const [showFavoriteJobs, setShowFavoriteJobs] = useState(false)
   const [showHiddenJobs, setShowHiddenJobs] = useState(false)
-
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   /* *******************************
@@ -211,6 +208,7 @@ export default function App() {
 
       <div className="pl-6 pb-6 font-semibold">
         Filter recent NYC.gov jobs for current non-employees. Jobs renew weekly.
+        Jobs refreshed on {datasetDate || '…'}
       </div>
 
       <FilterBar {...filterState} {...filterOptions} />

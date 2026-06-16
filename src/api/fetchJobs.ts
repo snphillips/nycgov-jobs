@@ -2,8 +2,7 @@ import type { NYCJobType } from '../types'
 
 const ENDPOINT = 'https://data.cityofnewyork.us/resource/kpav-sd4t.json'
 const APP_TOKEN = import.meta.env.VITE_NYC_JOBS_APP_TOKEN as string
-// TODO: once app is done, increase this retrieval to a higher number
-const RETRIEVAL_LIMIT = 1500
+const RETRIEVAL_LIMIT = 2000
 
 export async function fetchJobs(
   offset = 0,
