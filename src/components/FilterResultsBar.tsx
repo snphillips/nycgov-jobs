@@ -178,6 +178,7 @@ export function FilterResultsBar({
     filterState.setSelectedLevel([])
     filterState.setSelectedPostingAge([])
     filterState.setSelectedSalaryFrom([])
+    filterState.setSelectedNumberPositions([])
   }
 
   // Build the header text based on which display mode is active
