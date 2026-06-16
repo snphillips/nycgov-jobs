@@ -55,9 +55,9 @@ function JobCard({
           <h3 className="font-semibold leading-tight text-amber-950">
             {job.business_title}
           </h3>
-          <div>
+          <div className="fave-hide-buttons-container">
             <button
-              className="favorite-button bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-2! rounded-full shadow-indigo-500/50"
+              className="favorite-button bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-1! rounded-full shadow-indigo-500/50"
               onClick={handleFavorite}
               aria-label={isFavorited ? 'Unfavorite job' : 'Favorite job'}
             >
@@ -67,7 +67,7 @@ function JobCard({
               />
             </button>
             <button
-              className="hide-button bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-2! rounded-full shadow-indigo-500/50"
+              className="hide-button bg-transparent! text-gray-400 hover:text-gray-800 focus:outline-none p-1! rounded-full shadow-indigo-500/50"
               onClick={handleHide}
               aria-label={isHidden ? 'Unhide job' : 'Hide job'}
             >

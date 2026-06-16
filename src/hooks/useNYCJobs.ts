@@ -54,6 +54,8 @@ export function useNYCJobs() {
         // Cache hit — data is fresh enough, load from local DB
         if (timestamp && now - timestamp < MAX_AGE_MS) {
           const cachedJobs = await getJobsFromDB()
+          // keep for debugging
+          console.log('sample job:', cachedJobs?.[0])
           if (import.meta.env.DEV)
             console.log('Cache hit: loading jobs from DB')
           if (!abort && cachedJobs) {
@@ -95,7 +97,7 @@ export function useNYCJobs() {
             new Date(job.posting_date).getTime() >= sixMonthsAgo
         )
         // keep for debugging
-        // console.log('job shape:', filtered[0])
+        console.log('sample job:', filtered[0])
 
         if (!abort) {
           setJobs(filtered)

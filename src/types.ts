@@ -63,4 +63,5 @@ export interface FilterSelections {
   selectedLevel?: string[]
   selectedPostingAge?: string[]
   selectedSalaryFrom?: string[]
+  selectedNumberPositions?: string[]
 }

@@ -38,7 +38,7 @@ a:hover {
 
 h1 {
   font-size: 2em;
-  line-height: 0.5;
+  line-height: 0.9;
 }
 
 h2 {
@@ -48,6 +48,13 @@ h2 {
 h3 {
   font-size: 1.1em;
   margin-bottom: 6px;
+}
+
+.fave-hide-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
 
 button {

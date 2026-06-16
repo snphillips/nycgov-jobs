@@ -39,6 +39,9 @@ export function useJobFilters(jobs: NYCJobType[]) {
   const [selectedLevel, setSelectedLevel] = useState<string[]>([])
   const [selectedPostingAge, setSelectedPostingAge] = useState<string[]>([])
   const [selectedSalaryFrom, setSelectedSalaryFrom] = useState<string[]>([])
+  const [selectedNumberPositions, setSelectedNumberPositions] = useState<
+    string[]
+  >([])
 
   /* ── Deduplicate jobs by job_id ─────────────────────────────── */
 
@@ -74,6 +77,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
     selectedLevel,
     selectedPostingAge,
     selectedSalaryFrom,
+    selectedNumberPositions,
   }
 
   /* ── Filtered job list ──────────────────────────────────────── */
@@ -92,6 +96,7 @@ export function useJobFilters(jobs: NYCJobType[]) {
       selectedLevel,
       selectedPostingAge,
       selectedSalaryFrom,
+      selectedNumberPositions,
     ]
   )
 
@@ -123,6 +128,8 @@ export function useJobFilters(jobs: NYCJobType[]) {
       setSelectedPostingAge,
       selectedSalaryFrom,
       setSelectedSalaryFrom,
+      selectedNumberPositions,
+      setSelectedNumberPositions,
     },
     filterOptions,
   }

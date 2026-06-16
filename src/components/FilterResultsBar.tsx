@@ -21,6 +21,8 @@ interface FilterResultsBarProps {
     setSelectedPostingAge: (val: string[]) => void
     selectedSalaryFrom: string[]
     setSelectedSalaryFrom: (val: string[]) => void
+    selectedNumberPositions: string[]
+    setSelectedNumberPositions: (val: string[]) => void
   }
   showFavoriteJobs: boolean
   showHiddenJobs: boolean
@@ -49,6 +51,7 @@ export function FilterResultsBar({
   showHiddenJobs,
   onShowAllJobs,
   salaryFromOptions,
+  numberPositionsOptions,
 }: FilterResultsBarProps) {
   // Map raw API/internal filter values to user-friendly pill labels
   const filterPillLabelMap: Record<string, string> = {
@@ -135,6 +138,14 @@ export function FilterResultsBar({
       category: 'salaryRangeFrom',
       values: filterState.selectedSalaryFrom,
       setValues: filterState.setSelectedSalaryFrom,
+      format: (value: string) =>
+        salaryFromOptions.find((o) => o.value === value)?.label ?? value,
+      filterPillColor: 'bg-green-100 text-green-800',
+    },
+    {
+      category: 'numberPositions',
+      values: filterState.selectedNumberPositions,
+      setValues: filterState.setSelectedNumberPositions,
       format: (value: string) =>
         salaryFromOptions.find((o) => o.value === value)?.label ?? value,
       filterPillColor: 'bg-green-100 text-green-800',

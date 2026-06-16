@@ -30,6 +30,7 @@ import {
   bucketizeSalary,
   isValidFreq,
   parseBucketKey,
+  bucketizeNumberPositions,
 } from './jobFilterUtils'
 
 export function useFilterOptions(
@@ -57,6 +58,7 @@ export function useFilterOptions(
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -76,6 +78,7 @@ export function useFilterOptions(
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -92,6 +95,7 @@ export function useFilterOptions(
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
       allSelections.selectedOmittedAgencies,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -108,6 +112,7 @@ export function useFilterOptions(
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
       allSelections.selectedAgencies,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -127,6 +132,7 @@ export function useFilterOptions(
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -146,6 +152,7 @@ export function useFilterOptions(
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -161,6 +168,7 @@ export function useFilterOptions(
       allSelections.selectedCivilServiceTitle,
       allSelections.selectedPostingAge,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -177,6 +185,7 @@ export function useFilterOptions(
       allSelections.selectedCivilServiceTitle,
       allSelections.selectedLevel,
       allSelections.selectedSalaryFrom,
+      allSelections.selectedNumberPositions,
     ]
   )
 
@@ -193,6 +202,27 @@ export function useFilterOptions(
       allSelections.selectedCivilServiceTitle,
       allSelections.selectedLevel,
       allSelections.selectedPostingAge,
+      allSelections.selectedNumberPositions,
+    ]
+  )
+
+  const jobsForNumberPositions = useMemo(
+    () =>
+      applyFilters(uniqueJobs, {
+        ...allSelections,
+        selectedNumberPositions: [],
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      uniqueJobs,
+      allSelections.selectedEmploymentKind,
+      allSelections.selectedSalaryFrequency,
+      allSelections.selectedAgencies,
+      allSelections.selectedTitleClassification,
+      allSelections.selectedCivilServiceTitle,
+      allSelections.selectedLevel,
+      allSelections.selectedPostingAge,
+      allSelections.selectedSalaryFrom,
     ]
   )
 
@@ -239,7 +269,6 @@ export function useFilterOptions(
       }))
   }, [jobsForAgencies])
   // ================================
-  // TODO: Sarah, edit this useMemo
   const omittedAgenciesFilterOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     jobsForOmittedAgencies.forEach((job) => {
@@ -357,6 +386,44 @@ export function useFilterOptions(
     }))
   }, [jobsForPostingAge])
 
+  const numberPositionsOptions = useMemo(() => {
+    console.log(
+      'sample number_of_positions values:',
+      jobsForNumberPositions.slice(0, 5).map((j) => ({
+        raw: j.number_of_positions,
+        coerced: Number(j.number_of_positions),
+      }))
+    )
+    const counts: Record<string, number> = {
+      'positions:1': 0,
+      'positions:2-10': 0,
+      'positions:10-up': 0,
+    }
+    for (const job of jobsForNumberPositions) {
+      const n = Number(job.number_of_positions)
+      if (!Number.isFinite(n) || n <= 0) continue
+      const { key } = bucketizeNumberPositions(n)
+      counts[key] = (counts[key] ?? 0) + 1
+    }
+    return [
+      {
+        value: 'positions:1',
+        label: '1 position',
+        count: counts['positions:1'],
+      },
+      {
+        value: 'positions:2-10',
+        label: '2–10 positions',
+        count: counts['positions:2-10'],
+      },
+      {
+        value: 'positions:10-up',
+        label: '10+ positions',
+        count: counts['positions:10-up'],
+      },
+    ]
+  }, [jobsForNumberPositions])
+
   return {
     employmentKindOptions,
     salaryFrequencyOptions,
@@ -367,5 +434,6 @@ export function useFilterOptions(
     levelOptions,
     postingAgeOptions,
     salaryFromOptions,
+    numberPositionsOptions,
   }
 }

@@ -82,6 +82,22 @@ export function bucketizeSalary(
   return { key: `daily:${min}-${max}`, label: formatDailyLabel(min, max) }
 }
 
+// TODO: create bucketize function
+/**
+ * Buckets a raw number_of_positions value into one of three display groups.
+ * Examples:
+ *   bucketizeNumberPositions(1)  → { key: 'positions:1',     label: '1 position' }
+ *   bucketizeNumberPositions(5)  → { key: 'positions:2-10',  label: '2–10 positions' }
+ *   bucketizeNumberPositions(15) → { key: 'positions:10-up', label: '10+ positions' }
+ */
+export function bucketizeNumberPositions(n: number): {
+  key: string
+  label: string
+} {
+  if (n === 1) return { key: 'positions:1', label: '1 position' }
+  if (n <= 10) return { key: 'positions:2-10', label: '2–10 positions' }
+  return { key: 'positions:10-up', label: '10+ positions' }
+}
 /**
  * Parses a salary bucket key into its component parts for sorting.
  * Example: "annual:60000-80000" → { freq: 'annual', start: 60000, isUp: false }
@@ -133,6 +149,7 @@ export function applyFilters(
     selectedLevel = [],
     selectedPostingAge = [],
     selectedSalaryFrom = [],
+    selectedNumberPositions = [],
   } = filters
 
   return jobs.filter((job) => {
@@ -192,6 +209,14 @@ export function applyFilters(
       if (!Number.isFinite(amount) || !freq || !isValidFreq(freq)) return false
       const { key } = bucketizeSalary(amount, freq)
       if (!selectedSalaryFrom.includes(key)) return false
+    }
+    // TODO: fix this to filter corrected
+    // At the bottom of the .filter() callback, before `return true`:
+    if (selectedNumberPositions.length > 0) {
+      const n = Number(job.number_of_positions)
+      if (!Number.isFinite(n) || n <= 0) return false
+      const { key } = bucketizeNumberPositions(n)
+      if (!selectedNumberPositions.includes(key)) return false
     }
 
     return true

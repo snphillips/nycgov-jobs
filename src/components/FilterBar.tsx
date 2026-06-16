@@ -18,8 +18,6 @@ import type { Option } from '../types'
 
 interface FilterBarProps {
   selectedEmploymentKind: string[]
-  // React.Dispatch<React.SetStateAction<string[]>> is the TypeScript type for
-  // a useState setter function — it's what you get back from useState<string[]>()
   setSelectedEmploymentKind: React.Dispatch<React.SetStateAction<string[]>>
   employmentKindOptions: Option[]
 
@@ -54,6 +52,10 @@ interface FilterBarProps {
   selectedSalaryFrom: string[]
   setSelectedSalaryFrom: React.Dispatch<React.SetStateAction<string[]>>
   salaryFromOptions: Option[]
+
+  selectedNumberPositions: string[]
+  setSelectedNumberPositions: React.Dispatch<React.SetStateAction<string[]>>
+  numberPositionsOptions: Option[]
 }
 
 export function FilterBar({
@@ -84,6 +86,9 @@ export function FilterBar({
   salaryFromOptions,
   selectedSalaryFrom,
   setSelectedSalaryFrom,
+  selectedNumberPositions,
+  setSelectedNumberPositions,
+  numberPositionsOptions,
 }: FilterBarProps) {
   return (
     <section className="bg-stone-300 p-4 md:p-4 shadow-sm">
@@ -152,6 +157,13 @@ export function FilterBar({
           options={salaryFromOptions}
           selected={selectedSalaryFrom}
           onChange={setSelectedSalaryFrom}
+        />
+        <CheckboxFilter
+          id="numberPositions"
+          label="Number of Openings"
+          options={numberPositionsOptions}
+          selected={selectedNumberPositions}
+          onChange={setSelectedNumberPositions}
         />
       </div>
     </section>
