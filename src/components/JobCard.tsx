@@ -174,12 +174,17 @@ function JobCard({
             </p>
           </div>
         )}
-        {job.to_apply && (
-          <div>
-            <h5 className="font-medium mb-1">How to Apply</h5>
-            <p className="whitespace-pre-line">{cleanText(job.to_apply)}</p>
-          </div>
-        )}
+        <div>
+          <a
+            href={`https://cityjobs.nyc.gov/jobs?q=${job.job_id}&options=&page=1`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-auto inline-block text-sm font-medium text-amber-950 underline hover:text-amber-700"
+          >
+            View job on NYC.gov website ↗
+          </a>
+        </div>
+        {/* )} */}
       </section>
     </section>
   )

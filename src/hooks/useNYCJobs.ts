@@ -94,6 +94,8 @@ export function useNYCJobs() {
             job.posting_type === 'External' &&
             new Date(job.posting_date).getTime() >= sixMonthsAgo
         )
+        // keep for debugging
+        // console.log('job shape:', filtered[0])
 
         if (!abort) {
           setJobs(filtered)
