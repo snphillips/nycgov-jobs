@@ -112,6 +112,8 @@ export default function App() {
   // Apply pagination/infinite scroll slice
   const visibleJobs = displayJobs.slice(0, visibleCount)
 
+  const isListExhausted = visibleCount >= displayJobs.length
+
   const handleShowAllJobs = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setShowFavoriteJobs(false)
@@ -229,8 +231,28 @@ export default function App() {
         toggleHide={toggleHide}
       />
 
-      {/* Infinite scroll */}
-      <div ref={loaderRef} className="h-10" />
+      {/* Infinite scroll sentinel — hidden once all jobs are loaded */}
+      {!isListExhausted && <div ref={loaderRef} className="h-10" />}
+
+      {isListExhausted && (
+        <footer className="flex items-center justify-center gap-6 p-8 text-sm text-stone-400">
+          <a
+            href="https://sarahphillipsdev.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Made by Sarah Phillips ↗
+          </a>
+
+          <a
+            href="https://github.com/snphillips"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View code on GitHub ↗
+          </a>
+        </footer>
+      )}
     </div>
   )
 }

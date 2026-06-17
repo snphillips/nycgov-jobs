@@ -387,13 +387,14 @@ export function useFilterOptions(
   }, [jobsForPostingAge])
 
   const numberPositionsOptions = useMemo(() => {
-    console.log(
-      'sample number_of_positions values:',
-      jobsForNumberPositions.slice(0, 5).map((j) => ({
-        raw: j.number_of_positions,
-        coerced: Number(j.number_of_positions),
-      }))
-    )
+    // keep for debugging
+    // console.log(
+    //   'sample number_of_positions values:',
+    //   jobsForNumberPositions.slice(0, 5).map((j) => ({
+    //     raw: j.number_of_positions,
+    //     coerced: Number(j.number_of_positions),
+    //   }))
+    // )
     const counts: Record<string, number> = {
       'positions:1': 0,
       'positions:2-10': 0,
