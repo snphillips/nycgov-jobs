@@ -58,7 +58,7 @@ function JobCard({
             rel="noopener noreferrer"
             className="mt-auto inline-block font-medium text-amber-950 underline hover:text-amber-700"
           >
-            <h3 className="font-semibold leading-tight text-amber-950">
+            <h3 className="font-semibold leading-tight">
               {job.business_title}
             </h3>
           </a>
