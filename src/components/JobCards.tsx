@@ -61,7 +61,10 @@ export function JobCards({
         <div className="col-span-full flex flex-col items-center">
           {loading && (
             <p className="text-stone-600 font-medium mb-2">
-              Loading NYC job listings…
+              Loading NYC job listings
+              <span className="dot">.</span>
+              <span className="dot">.</span>
+              <span className="dot">.</span>
             </p>
           )}
           {error && (
