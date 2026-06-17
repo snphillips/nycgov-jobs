@@ -40,14 +40,21 @@ export default function App() {
   /* *******************************
    * Scroll to top
    * ***************************** */
+  const headingRef = useRef<HTMLHeadingElement>(null)
+
+  const scrollToTop = () => {
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'smooth' })
+    headingRef.current?.focus()
+  }
+
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  // Scroll handler
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   /* *******************************
    * FAVORITE / HIDE MUTATORS
@@ -185,7 +192,9 @@ export default function App() {
       )}
       <Toaster position="top-center" />
       <header className="flex items-center justify-between">
-        <h1 className="p-6">nyc gov job search</h1>
+        <h1 ref={headingRef} tabIndex={-1} className="p-6">
+          nyc gov job search
+        </h1>
 
         {/* Right side: icons */}
         <div className="flex items-center gap-4 pr-6">
