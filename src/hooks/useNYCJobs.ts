@@ -93,6 +93,7 @@ export function useNYCJobs() {
 
             if (!apiProcessDate || apiProcessDate <= cacheProcessDate) {
               if (import.meta.env.DEV)
+                // keep for debugging
                 console.log('Cache hit: dataset unchanged, loading from DB')
               setJobs(cachedJobs)
               setDatasetDate(getDatasetDate(cachedJobs))
@@ -101,12 +102,16 @@ export function useNYCJobs() {
             }
 
             if (import.meta.env.DEV)
+              // keep for debugging
               console.log('Cache busted: dataset refreshed since last fetch')
           }
         }
 
         // Full re-fetch — either cache expired or dataset was refreshed
-        if (import.meta.env.DEV) console.log('Fetching fresh jobs from API')
+        if (import.meta.env.DEV) {
+          // keep for debugging
+          console.log('Fetching fresh jobs from API')
+        }
         const firstPage = await fetchJobs(0, RETRIEVAL_LIMIT, controller.signal)
         if (abort) return
 

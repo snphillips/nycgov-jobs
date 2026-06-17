@@ -37,6 +37,8 @@ interface JobCardsProps {
   toggleFavorite: (job: NYCJobType) => void
   hiddenJobs: Set<string>
   toggleHide: (job: NYCJobType) => void
+  loading?: boolean
+  error?: Error | null
 }
 
 export function JobCards({
@@ -45,22 +47,38 @@ export function JobCards({
   toggleFavorite,
   hiddenJobs,
   toggleHide,
+  loading,
+  error,
 }: JobCardsProps) {
-  if (visibleJobs.length === 0) {
-    const { src, caption } = pickRandomImage()
-    return (
-      <main className="flex flex-col items-center bg-stone-300 min-h-screen p-6">
-        <div className="w-full flex flex-col">
-          <img src={src} alt="No jobs found" className="w-full block" />
-          <p className="text-stone-600 font-medium text-base mt-2 text-center">
-            {caption}
-          </p>
-        </div>
-      </main>
-    )
-  }
+  const isEmpty = visibleJobs.length === 0
+  const { src, caption } = isEmpty
+    ? pickRandomImage()
+    : { src: '', caption: '' }
+
   return (
     <main className="grid gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-h-screen bg-stone-300">
+      {(loading || error || isEmpty) && (
+        <div className="col-span-full flex flex-col items-center">
+          {loading && (
+            <p className="text-stone-600 font-medium mb-2">
+              Loading NYC job listings…
+            </p>
+          )}
+          {error && (
+            <p className="text-red-600 font-medium mb-2">
+              Error: {error.message}
+            </p>
+          )}
+          {isEmpty && (
+            <>
+              <img src={src} alt="No jobs found" className="w-full block" />
+              <p className="text-stone-600 font-medium text-base mt-2 text-center">
+                {caption}
+              </p>
+            </>
+          )}
+        </div>
+      )}
       {visibleJobs.map((job: NYCJobType) => (
         <JobCard
           key={`${job.job_id}-${job.posting_updated}`}

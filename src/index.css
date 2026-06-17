@@ -29,11 +29,7 @@ body {
 
 a {
   font-weight: 500;
-  color: #3f46bf;
   text-decoration: inherit;
-}
-a:hover {
-  color: #5960e3;
 }
 
 h1 {

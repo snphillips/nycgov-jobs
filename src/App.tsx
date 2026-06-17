@@ -8,6 +8,7 @@ import { FilterResultsBar } from './components/FilterResultsBar'
 import type { NYCJobType } from './types'
 import { HeartIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 import { Toaster } from 'react-hot-toast'
+import { FaGithub } from 'react-icons/fa'
 
 const PAGE_SIZE = 12
 
@@ -158,8 +159,8 @@ export default function App() {
   /* *******************************
    * LOADING / ERROR
    * ***************************** */
-  if (loading) return <p className="p-6">Loading NYC job listings…</p>
-  if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
+  // if (loading) return <p className="p-6">Loading NYC job listings…</p>
+  // if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
 
   /* *******************************
    * RENDER
@@ -229,6 +230,8 @@ export default function App() {
         hiddenJobs={hiddenJobs}
         toggleFavorite={toggleFavorite}
         toggleHide={toggleHide}
+        loading={loading}
+        error={error}
       />
 
       {/* Infinite scroll sentinel — hidden once all jobs are loaded */}
@@ -240,6 +243,7 @@ export default function App() {
             href="https://sarahphillipsdev.netlify.app/"
             target="_blank"
             rel="noopener noreferrer"
+            className="hover:text-stone-200"
           >
             Made by Sarah Phillips ↗
           </a>
@@ -248,8 +252,9 @@ export default function App() {
             href="https://github.com/snphillips"
             target="_blank"
             rel="noopener noreferrer"
+            className="hover:text-stone-200"
           >
-            View code on GitHub ↗
+            <FaGithub className="h-6 w-6" />
           </a>
         </footer>
       )}

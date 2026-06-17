@@ -115,7 +115,3 @@ export function bucketizeSalary(
   const max = min + dailyWageStep
   return { key: `daily:${min}-${max}`, label: formatDailyLabel(min, max) }
 }
-
-export function bucketizeNumberPositions() {
-  console.log('bucketizeNumberPositions')
-}
