@@ -51,7 +51,6 @@ export function FilterResultsBar({
   showHiddenJobs,
   onShowAllJobs,
   salaryFromOptions,
-  numberPositionsOptions,
 }: FilterResultsBarProps) {
   // Map raw API/internal filter values to user-friendly pill labels
   const filterPillLabelMap: Record<string, string> = {
