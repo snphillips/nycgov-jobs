@@ -35,6 +35,19 @@ export default function App() {
   const [showFavoriteJobs, setShowFavoriteJobs] = useState(false)
   const [showHiddenJobs, setShowHiddenJobs] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+
+  /* *******************************
+   * Scroll to top
+   * ***************************** */
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 400)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Scroll handler
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   /* *******************************
    * FAVORITE / HIDE MUTATORS
@@ -157,16 +170,19 @@ export default function App() {
   }, [])
 
   /* *******************************
-   * LOADING / ERROR
-   * ***************************** */
-  // if (loading) return <p className="p-6">Loading NYC job listings…</p>
-  // if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>
-
-  /* *******************************
    * RENDER
    * ***************************** */
   return (
     <div id="app">
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-stone-800 text-white w-10 h-10 flex items-center justify-center shadow-lg opacity-90 hover:opacity-100 transition-opacity"
+        >
+          ↑
+        </button>
+      )}
       <Toaster position="top-center" />
       <header className="flex items-center justify-between">
         <h1 className="p-6">nyc gov job search</h1>
