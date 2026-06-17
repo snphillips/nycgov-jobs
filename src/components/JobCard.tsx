@@ -52,9 +52,16 @@ function JobCard({
     <section className="w-full bg-stone-100 shadow-md rounded-lg p-4 flex flex-col gap-6 border-b h-100 overflow-auto">
       <header className="card-header flex flex-col gap-1">
         <div className="title-icons-row flex flex-row justify-between">
-          <h3 className="font-semibold leading-tight text-amber-950">
-            {job.business_title}
-          </h3>
+          <a
+            href={`https://cityjobs.nyc.gov/jobs?q=${job.job_id}&options=&page=1`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-auto inline-block font-medium text-amber-950 underline hover:text-amber-700"
+          >
+            <h3 className="font-semibold leading-tight text-amber-950">
+              {job.business_title}
+            </h3>
+          </a>
           <div className="fave-hide-buttons-container">
             <button
               className="favorite-button bg-transparent! text-gray-400 hover:text-red-800 focus:outline-none p-1! rounded-full shadow-indigo-500/50"
